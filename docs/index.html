@@ -177,6 +177,17 @@
 
     /* Display and Note are folded away by default: on a tablet the image is
        worth far more screen than a slider the counter may never touch. */
+    /* On a phone the two actions a counter reaches for constantly -- "nothing
+       here" and undo -- must not sit below the fold. Put the count block right
+       after the label buttons and push the view switch down. */
+    aside{display:flex}
+    aside > div:nth-child(1){order:1}   /* marking as   */
+    aside > div:nth-child(4){order:2}   /* this square  */
+    aside > div:nth-child(2){order:3}   /* view         */
+    aside > div:nth-child(3){order:4}   /* display      */
+    aside > div:nth-child(5){order:5}   /* note         */
+    #btnMore{order:6}
+
     aside .extra{display:none}
     aside.show-more .extra{display:block}
     .moretoggle{display:block;flex:0 0 auto;min-width:44px;padding:7px 12px;
@@ -391,7 +402,7 @@
         <div class="tot"><span id="tot">0</span><small id="totBreak"></small></div>
         <button id="btnEmpty" style="width:100%;margin-top:8px" data-i18n="side.empty">Nothing here</button>
         <button id="btnUndo" style="width:100%;margin-top:6px" data-i18n="side.undo">Undo</button>
-        <button id="btnClear" style="width:100%;margin-top:6px" data-i18n="side.clear">Clear</button>
+        <button id="btnClear" class="extra" style="width:100%;margin-top:6px" data-i18n="side.clear">Clear</button>
       </div>
       <div class="noteblock extra">
         <h3 data-i18n="side.note">Note (optional)</h3>
