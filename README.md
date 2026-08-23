@@ -190,6 +190,46 @@ the one worth practising.
 Their sheets record numbers, not positions, so they cannot supply the reference
 marks themselves; they choose the squares, and you supply the marks.
 
+### Getting the source images down
+
+OneDrive keeps files as placeholders and gives no progress for a file nobody has
+opened, so "is it downloading?" has no answer until you force it:
+
+```bash
+/usr/bin/python3 tools/fetch_sources.py --fetch --watch
+```
+
+It works out exactly which files your build needs, asks for them all at once, and
+shows what actually arrives. In testing it pulled 19 of 20 files in 18 seconds
+after they had sat as placeholders for hours. It only ever reads.
+
+### Drafting the marks instead of clicking from scratch
+
+```bash
+/usr/bin/python3 tools/propose_reference.py --manifest docs/manifest.json --expect "F5=11,E1=12,F4=6,F2=5,G6=9"
+```
+
+Proposes a position and a live/dead call for every nucleus it can find, and — if
+you pass `--expect` — checks itself against totals you already trust.
+
+**What comes out is a draft, not the reference.** Load it with `--prefill-from`,
+correct it in the app (proposed marks are drawn dashed until you touch them), and
+your corrected version is the reference. This is not caution for its own sake: the
+study exists to compare manual counts against the automated pipeline, so training
+people to match a detector and then measuring their agreement with a detector
+answers nothing. Bafti et al. (2021) is the precedent for assisted annotation —
+it holds up *when a person still adjudicates*.
+
+The build refuses `--prefill-from` together with `--reference-passes > 1`: every
+pass would start from the same draft, so your passes would agree because they
+began identically, inflating the very number that decides whether a 90% gate is
+fair.
+
+**It needs a decent stimulus.** On source-derived tiles the proposals land on real
+nuclei. On crops from `COUNT_field_*_grid.png` — a blurred, upscaled matplotlib
+render — they do not: tested against the five squares Maryam and Louise agreed on,
+per-square errors ran from −8 to +7 while the total came out close by luck.
+
 ### Making the reference — count them several times
 
 The reference comes from **your own passes through the app**, not from the

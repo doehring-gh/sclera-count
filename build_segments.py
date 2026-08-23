@@ -776,6 +776,12 @@ def main():
     p.add_argument("--seconds-per-square", type=float, default=45.0,
                    help="used only to estimate how long a counter's set will take")
     p.add_argument("--seed", type=int, default=20260823)
+    p.add_argument("--prefill-from", default="",
+                   help="a reference_proposal.json from tools/propose_reference.py. "
+                        "Its marks are placed on each square for you to CORRECT. "
+                        "Only ever use this for authoring a reference, never for a "
+                        "participant's set -- seeing a detector's answer first would "
+                        "anchor them to it")
     p.add_argument("--training-from", default="",
                    help="an exported *_session.json from a reference counter. Its "
                         "squares become a training round every counter does first, "
@@ -902,6 +908,29 @@ def main():
     if training and not assignable:
         raise SystemExit("every segment is a training square -- lower --training-n")
 
+    prefill = None
+    if args.prefill_from:
+        pf = json.loads(Path(args.prefill_from).read_text())
+        prefill = {}
+        for key, st in (pf.get("seg") or {}).items():
+            prefill.setdefault(key.split("#")[0],
+                               [{"x": m["x"], "y": m["y"], "label": m.get("label", "cell")}
+                                for m in st.get("marks", [])])
+        print(f"prefill: {sum(len(v) for v in prefill.values())} proposed marks on "
+              f"{len(prefill)} squares (a DRAFT to correct, not an answer)")
+
+    if args.reference_passes > 1 and prefill:
+        raise SystemExit(
+            "\n--prefill-from with --reference-passes > 1 is refused, on purpose.\n\n"
+            "Every pass would start from the SAME draft, so your passes would agree\n"
+            "with each other because they began identically, not because you saw the\n"
+            "same thing twice. That inflates your between-pass agreement -- the one\n"
+            "number used to decide whether a 90% gate is fair -- and would make an\n"
+            "unfair gate look justified.\n\n"
+            "Pick one:\n"
+            "  --reference-passes 3                    independent passes, slower, honest\n"
+            "  --prefill-from ... --reference-passes 1  one assisted pass, detector-anchored\n")
+
     if args.reference_passes:
         # One person counts the same few squares several times over. Their
         # repeats are then combined into a consensus reference, and the spread
@@ -923,6 +952,7 @@ def main():
             "layers": LAYERS_BY_SCHEME[args.scheme],
             "fields": fields_meta, "segments": all_segments,
             "anchors": [], "blocks": manifest_blocks, "training": None,
+            "prefill": prefill,
             "match_um": args.match_um,
             "assignment": {"reference_passes": args.reference_passes,
                            "seed": args.seed},
@@ -957,6 +987,7 @@ def main():
         "anchors": anchors,
         "blocks": blocks,
         "training": training,
+        "prefill": prefill,
         "match_um": args.match_um,
         "assignment": {
             "n_blocks": args.blocks, "replicates": args.replicates,

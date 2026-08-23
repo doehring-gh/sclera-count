@@ -509,6 +509,7 @@ en: {
   "side.thissquare":"This square","side.empty":"Nothing here","side.clear":"Clear marks",
   "side.undo":"Undo","side.note":"Note (optional)","side.notePlaceholder":"e.g. very out of focus",
   "side.marked":"nuclei marked","side.more":"More ▾","side.less":"Less ▴",
+  "prefill.notice":"{n} suggested marks (dashed) — check every one, they are a draft",
 
   "count.finish":"Finish","count.next":"Next","count.back":"Back",
   "count.download":"Download my counts",
@@ -609,6 +610,7 @@ de: {
   "side.thissquare":"Dieses Quadrat","side.empty":"Nichts zu sehen","side.clear":"Markierungen löschen",
   "side.undo":"Rückgängig","side.note":"Anmerkung (optional)","side.notePlaceholder":"z. B. sehr unscharf",
   "side.marked":"Zellkerne markiert","side.more":"Mehr ▾","side.less":"Weniger ▴",
+  "prefill.notice":"{n} Vorschläge (gestrichelt) — bitte jeden prüfen, es ist ein Entwurf",
 
   "count.finish":"Fertig","count.next":"Weiter","count.back":"Zurück",
   "count.download":"Zählungen herunterladen",
@@ -848,8 +850,19 @@ function offerResume(){
 function isTraining(i){ return i < (S.n_training || 0); }
 function keyAt(i){ return `${S.order[i]}#${i}`; }
 function state(k){
-  if (!S.seg[k]) S.seg[k] = {marks:[], undone:[], empty:false, note:"",
-                             bri:100, con:100, seconds:0, done:false};
+  if (!S.seg[k]) {
+    S.seg[k] = {marks:[], undone:[], empty:false, note:"",
+                bri:100, con:100, seconds:0, done:false};
+    // Reference authoring only: start from a detector's draft so this is a review
+    // job rather than a from-scratch clicking job. Never enabled for participants
+    // -- seeing a proposed answer first would anchor them to it.
+    const pf = M.prefill && M.prefill[S.order[+k.split("#")[1]]];
+    if (pf && pf.length) {
+      S.seg[k].marks = pf.map(m => ({x:m.x, y:m.y, label:m.label, t:nowISO(),
+                                     proposed:true}));
+      S.seg[k].prefilled = pf.length;
+    }
+  }
   return S.seg[k];
 }
 function repNumber(i){
@@ -959,6 +972,7 @@ function show(){
   $("#btnPrev").disabled = idx === 0;
   $("#btnEmpty").classList.toggle("primary", st.empty);
 
+  if (st.prefilled && !st.reviewed) toast(t("prefill.notice", {n:st.prefilled}));
   IMGS[curLayer].onload = () => { fitView(); draw(); };
   if (IMGS[curLayer].complete) fitView();
   draw();
@@ -1014,11 +1028,13 @@ function draw(){
   }
 
   st.marks.forEach((m, i) => {
+    const dash = m.proposed ? `stroke-dasharray="${r*0.55} ${r*0.45}"` : "";
     h += `<g class="mk" data-i="${i}" style="cursor:pointer">
             <circle cx="${m.x}" cy="${m.y}" r="${r*2.2}" fill="transparent"/>
             <circle cx="${m.x}" cy="${m.y}" r="${r}" fill="none"
-                    stroke="${colourOf(m.label)}" stroke-width="${sw*1.6}"/>
-            <circle cx="${m.x}" cy="${m.y}" r="${r*0.28}" fill="${colourOf(m.label)}"/>
+                    stroke="${colourOf(m.label)}" stroke-width="${sw*1.6}" ${dash}/>
+            <circle cx="${m.x}" cy="${m.y}" r="${r*0.28}" fill="${colourOf(m.label)}"
+                    ${m.proposed ? 'fill-opacity="0.45"' : ""}/>
           </g>`;
   });
   sv.innerHTML = h;
@@ -1071,6 +1087,7 @@ function redo(){
 }
 function leaveSeg(){
   const st = state(keyAt(idx));
+  if (st.prefilled) st.reviewed = true;
   st.seconds = +(st.seconds + (performance.now() - segEnteredAt) / 1000).toFixed(1);
   st.note = $("#note").value;
   save();
