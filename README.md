@@ -15,6 +15,13 @@ that Maryam and Louise did. Three things change:
 - **Depth is a factor, not a constant.** Squares are sampled at several z levels,
   so you can measure whether countability falls off with depth.
 
+**Live now:** https://doehring-gh.github.io/sclera-count/ — currently a PILOT
+build from a stand-in field, because the five real fields have not finished
+downloading from OneDrive. Rebuild and push to replace it.
+
+Send each counter their own pre-filled link:
+`https://doehring-gh.github.io/sclera-count/?block=B03&mode=livedead&rater=Maryam&lang=de`
+
 ```
 SCLERA_CountApp/
 ├── build_segments.py     cuts stacks into per-square tiles + manifest.json
@@ -23,7 +30,9 @@ SCLERA_CountApp/
 │   ├── manifest.json     written by build_segments.py
 │   └── tiles/            written by build_segments.py
 ├── apps_script/Code.gs   Google Apps Script that collects counts into a Sheet
+├── study.example.json    point the build at another stain, tissue or depth
 ├── analysis/agreement.py inter-rater agreement, object level, by depth
+├── analysis/legacy_agreement.py  reads Maryam's and Louise's original tally sheets
 └── testbuild/            a working demo (see "Try it now")
 ```
 
@@ -61,6 +70,50 @@ within location rather than across fields. Two safeguards make that work:
 
 Blocks are also shuffled, so anchors are interspersed rather than counted first
 by everyone while least practised, and depths arrive interleaved.
+
+---
+
+## Language, and using it on a tablet or phone
+
+The whole interface switches between **English and German** with the EN/DE
+buttons, or `?lang=de` in the link. That includes the wording carried in the
+manifest — channel names, task names, prompts — so a new stain added through
+`study.json` supplies both languages alongside each other (`name` / `name_de`).
+A missing German string falls back to English, so translation can be partial.
+
+Counters start on a **How to count** page with worked diagrams for the two things
+that actually cause disagreement: what to click, and the centre-in-the-square
+edge rule. It is reachable at any time from the **?** button while counting.
+
+Layout adapts down to a phone: the side panel becomes a strip under the image,
+"nothing here" and undo stay above the fold, and the rarely-used display sliders
+fold behind **More**. Pinch to zoom, drag to pan, tap a mark to remove it.
+
+The interface is light grey, white and blue — but **the image stage stays black**,
+deliberately. Confocal nuclei are faint emission on a dark ground; showing them
+against white would change what a counter can see, and this study depends on the
+stimulus being identical for everyone.
+
+---
+
+## Using another stain, tissue or depth range
+
+Copy `study.example.json` to `study.json`, edit, and build:
+
+```bash
+/usr/bin/python3 build_segments.py --config study.json --clean
+```
+
+Everything the build assumes lives in that one file: where the images are, how
+they are named, which RGB channel carries which dye, how the grid is cut, the
+physical scale, and the exact wording counters read in both languages. It carries
+a worked example of adding a completely new stain (DAPI + propidium iodide).
+Command-line flags still override the file, and any key you leave out keeps its
+default.
+
+One constraint that is not a limitation of the code: only a stain that labels
+**every** cell can support a "count the total" task. With a stain that marks a
+subset there is no denominator, so offer the live/dead task instead.
 
 ---
 
@@ -119,6 +172,25 @@ systematic inter-observer bias, so the app has one. Every counter starts with a
 few practice squares. When they move on from each, the reference answer appears
 over their own marks — green rings for nuclei you both found, dashed white for
 ones they missed — with a plain-English tally, then they continue.
+
+### Choosing which squares to train on
+
+`analysis/legacy_agreement.py` reads Maryam's and Louise's original tally sheets
+and recommends the squares. Run it first:
+
+```bash
+/usr/bin/python3 analysis/legacy_agreement.py --n-training 6
+```
+
+It picks squares where the two of them **independently reached the same total** —
+so the detection reference is credible — preferring those where they then **split
+on how many were dead**, because that is the judgement actually in dispute and
+the one worth practising.
+
+Their sheets record numbers, not positions, so they cannot supply the reference
+marks themselves; they choose the squares, and you supply the marks.
+
+### Making the reference
 
 The reference comes from **your own pass through the app**, not from the automated
 detector. Training counters against the detector would make the whole comparison
