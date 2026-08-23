@@ -190,11 +190,44 @@ the one worth practising.
 Their sheets record numbers, not positions, so they cannot supply the reference
 marks themselves; they choose the squares, and you supply the marks.
 
-### Making the reference
+### Making the reference — count them several times
 
-The reference comes from **your own pass through the app**, not from the automated
-detector. Training counters against the detector would make the whole comparison
-circular. So:
+The reference comes from **your own passes through the app**, not from the
+automated detector. Training counters against the detector would make the whole
+comparison circular.
+
+Count the chosen squares **more than once**. A single pass is one opinion on one
+day, and the gate then holds twenty people to it at 90%. Counting three times and
+keeping only what survives removes the marks you were never sure about — a
+nucleus you found in one pass out of three was not a stable observation, and
+failing someone for missing it measures your noise, not theirs.
+
+```bash
+/usr/bin/python3 build_segments.py --from-grid --fields 1 --only-squares F5,E1,F4,F2,G6 --reference-passes 3 --out refbuild --clean
+cd refbuild && /usr/bin/python3 -m http.server 8731
+```
+
+Count all 15 (5 squares × 3 passes, shuffled so you do not meet them in the same
+order), press **Download my counts**, then:
+
+```bash
+/usr/bin/python3 analysis/make_reference.py ~/Downloads/SCLERA_..._session.json --manifest refbuild/manifest.json --out reference_consensus.json
+```
+
+A mark becomes part of the reference if it appears in a **majority of passes**;
+its position is the mean of those marks and its label the majority label. The
+script prints **your own agreement between passes**, which is the ceiling for the
+gate:
+
+```
+your own agreement between passes: F1 0.864
+
+  YOUR OWN passes agree at 0.86, below a 0.90 pass mark.
+  A gate at 0.90 would demand participants be more consistent with you
+  than you are with yourself, and most would fail on your noise.
+```
+
+Then build:
 
 1. Build once without `--training-from`.
 2. Count some squares yourself in the app and press **Download my counts** —
@@ -205,6 +238,40 @@ circular. So:
 /usr/bin/python3 build_segments.py --z-levels 5,9,13,17 --squares-per-field 16 --blocks 20 --replicates 3 --anchors 5 --repeat-fraction 0.15 --training-from ~/Downloads/SCLERA_Daniela_B01_livedead_..._session.json --training-n 6 --clean
 ```
 
+### The pass gate
+
+Participants must reproduce the reference before any of their real counts are
+kept. Two separate scores, because they fail for different reasons:
+
+| | |
+|---|---|
+| **number** | how close your total is to the reference, summed over the practice squares |
+| **location** | detection F1 — were they the *same* nuclei, matched by position |
+
+Both must clear `--gate-count` and `--gate-location` (default 0.90). Number alone
+is not enough: marking ten wrong things scores 100% on count and nothing on
+location. Location alone is not enough either, because it ignores a systematic
+tendency to over- or under-count.
+
+Failing shows a square-by-square table and **one** piece of advice aimed at what
+actually went wrong — missing nuclei, marking too many, marks off-centre, or
+right nuclei but wrong live/dead call. "Practice again" wipes the practice
+answers and restarts the set. There is no limit on attempts; the attempt count
+and both scores are written into every exported row, so you can see afterwards
+who sailed through and who needed five goes.
+
+The build refuses to let this pass silently:
+
+```
+WARNING: the reference author's own passes agree at only 0.86, below the 0.90
+gate. Participants would have to beat the reference's own repeatability.
+Lower --gate-location or add more reference passes.
+```
+
+**This is a workflow gate, not a security control.** It lives in the browser, so
+someone determined could edit their way past it. That is why the scores are in
+the exported data — the audit is the defence, not the lock.
+
 Two properties the build enforces, both verified:
 
 - **Training squares are held out of every counting set.** Otherwise a counter
@@ -213,6 +280,8 @@ Two properties the build enforces, both verified:
   the fix.)
 - **Training answers never reach the results.** They are practice with the answer
   visible, so they are excluded from `rows()` and `markerRows()` entirely.
+- **Returning later cannot skip the gate.** Anyone resuming without a recorded
+  pass lands back on practice square 1.
 
 Practice squares are labelled `PRACTICE 1 of 4` with "these do not count towards
 your results", and the real squares are numbered from 1 independently.

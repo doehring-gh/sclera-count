@@ -72,6 +72,7 @@ REPO = APP_DIR.parent
 CONFOCAL = REPO / "confocal"
 GRID_DIR = REPO / "SCLERA_Detection_Analysis" / "manual_count_experiment"
 
+ONLY_SQUARES = set()
 COLS = "ABCDEFGH"
 ROWS = "12345678"
 CH = {"R": 0, "G": 1, "B": 2}
@@ -403,6 +404,8 @@ def build_field(fld, field_no, args, tiles_dir, cuts, squares):
             sq = f"{clab}{rlab}"
             if sq not in squares:
                 continue
+            if ONLY_SQUARES and sq not in ONLY_SQUARES:
+                continue
             x0, y0, x1, y1 = square_bounds(w, h, ci, ri)
             tx0, ty0 = max(0, x0 - margin), max(0, y0 - margin)
             tx1, ty1 = min(w, x1 + margin), min(h, y1 + margin)
@@ -485,12 +488,21 @@ def find_panels(a):
     return panels, pitch, green
 
 
-def despeckle_green(img, green):
+def despeckle_green(img, green, line_px=3):
+    """Erase the baked-in grid lines and cell labels, filling from neighbours.
+
+    The median window has to be wide enough that the line is a MINORITY inside
+    it. These lines are 3 px of core plus an anti-aliased pixel each side, so a
+    5x5 median is still mostly line and helpfully replaces green with green. Use
+    at least 3x the line width, and dilate the mask to catch the soft flanks the
+    colour threshold misses.
+    """
     from PIL import ImageFilter
-    med = img.filter(ImageFilter.MedianFilter(5))
+    win = max(5, (line_px * 3) | 1)          # odd, >= 3x the line width
+    med = img.filter(ImageFilter.MedianFilter(win))
     out = np.array(img)
     m = np.array(Image.fromarray(green.astype(np.uint8) * 255)
-                 .filter(ImageFilter.MaxFilter(3))) > 0
+                 .filter(ImageFilter.MaxFilter(5))) > 0
     out[m] = np.array(med)[m]
     return Image.fromarray(out)
 
@@ -518,6 +530,8 @@ def build_field_from_grid(spec, args, tiles_dir):
             tx0, ty0 = max(0, x0 - margin), max(0, y0 - margin)
             tx1, ty1 = min(w, x1 + margin), min(h, y1 + margin)
             sq = f"{clab}{rlab}"
+            if ONLY_SQUARES and sq not in ONLY_SQUARES:
+                continue
             seg_id = f"f{spec['field']}_{sq}"
             files = {}
             for role, im in layers.items():
@@ -549,7 +563,7 @@ def build_field_from_grid(spec, args, tiles_dir):
 
 
 # ------------------------------------------------------------------ assignment
-def load_training(path, n, segments, match_um, fields_meta):
+def load_training(path, n, segments, match_um, fields_meta, gate=(0.90, 0.90)):
     """Turn a reference counter's exported session into a training round.
 
     Britten-Jones et al. (2022) found that a consensus training step was what
@@ -592,6 +606,9 @@ def load_training(path, n, segments, match_um, fields_meta):
         "source": Path(path).name,
         "rater": sess.get("rater", "reference"),
         "mode": sess.get("mode"),
+        "own_pairwise_f1": sess.get("own_pairwise_f1"),
+        "passes_per_square": sess.get("passes_per_square"),
+        "gate": {"min_count_accuracy": gate[0], "min_location_f1": gate[1]},
     }
 
 
@@ -716,6 +733,14 @@ def main():
     p.add_argument("--z-levels", default="5,9,13,17",
                    help=f"z slices to sample from every stack ({Z_UM} um apart). "
                         f"Depth becomes a factor you can test rather than a constant")
+    p.add_argument("--only-squares", default="",
+                   help="build only these grid squares, e.g. 'F5,E1,F4,F2,G6'. Used to "
+                        "make a small reference set from the squares two counters "
+                        "already agreed on (see analysis/legacy_agreement.py)")
+    p.add_argument("--reference-passes", type=int, default=0,
+                   help="build a REF block containing the squares --reference-passes "
+                        "times over, shuffled between passes, so one person can count "
+                        "them repeatedly and their agreed answer becomes the reference")
     p.add_argument("--squares-per-field", type=int, default=0,
                    help="sample this many of the 64 squares per stack, stratified by "
                         "signal (0 = all 64). The same squares are used at every depth")
@@ -755,6 +780,12 @@ def main():
                    help="an exported *_session.json from a reference counter. Its "
                         "squares become a training round every counter does first, "
                         "with the reference answer shown as feedback after each one")
+    p.add_argument("--gate-count", type=float, default=0.90,
+                   help="participants must reach this accuracy on the NUMBER of "
+                        "nuclei across the practice squares before their real counts "
+                        "are kept (0 disables the gate)")
+    p.add_argument("--gate-location", type=float, default=0.90,
+                   help="and this detection F1 on WHICH nuclei, matched by position")
     p.add_argument("--training-n", type=int, default=6,
                    help="how many training squares to use from that session")
     p.add_argument("--match-um", type=float, default=8.0,
@@ -769,6 +800,9 @@ def main():
     p.add_argument("--out", default="docs", help="output directory (default docs/)")
     p.add_argument("--clean", action="store_true", help="wipe the tiles directory first")
     args = p.parse_args()
+
+    global ONLY_SQUARES
+    ONLY_SQUARES = {x.strip().upper() for x in args.only_squares.split(",") if x.strip()}
 
     cfg = apply_config(args.config) if args.config else {}
     if cfg.get("study") and args.study == p.get_default("study"):
@@ -857,7 +891,8 @@ def main():
         raise SystemExit("no fields built")
 
     training = (load_training(args.training_from, args.training_n, all_segments,
-                              args.match_um, fields_meta)
+                              args.match_um, fields_meta,
+                              (args.gate_count, args.gate_location))
                 if args.training_from else None)
 
     # A training square must never appear in anyone's real set: they have just
@@ -866,6 +901,45 @@ def main():
     assignable = [s for s in all_segments if s["id"] not in train_ids]
     if training and not assignable:
         raise SystemExit("every segment is a training square -- lower --training-n")
+
+    if args.reference_passes:
+        # One person counts the same few squares several times over. Their
+        # repeats are then combined into a consensus reference, and the spread
+        # between their own passes says how firm that reference actually is.
+        ids = [s["id"] for s in all_segments]
+        rng = np.random.default_rng(args.seed)
+        order = []
+        for _ in range(args.reference_passes):
+            a = np.array(ids, dtype=object); rng.shuffle(a)
+            order.extend(a.tolist())
+        manifest_blocks = {"REF": order}
+        out = docs / "manifest.json"
+        docs.mkdir(parents=True, exist_ok=True)
+        (docs / "manifest.json").write_text(json.dumps({
+            "schema": "sclera-count-manifest-v1",
+            "study": args.study + " — reference pass",
+            "built_by": "build_segments.py --reference-passes",
+            "endpoint": "", "modes": MODES_BY_SCHEME[args.scheme],
+            "layers": LAYERS_BY_SCHEME[args.scheme],
+            "fields": fields_meta, "segments": all_segments,
+            "anchors": [], "blocks": manifest_blocks, "training": None,
+            "match_um": args.match_um,
+            "assignment": {"reference_passes": args.reference_passes,
+                           "seed": args.seed},
+            "tiling": {"built_from": "grid_figure" if args.from_grid else "confocal_source",
+                       "context_margin_fraction": args.context,
+                       "upscale": args.upscale, "resample": args.resample, "z_um": Z_UM},
+            "display_stretch": {"mode": args.stretch, "lo_pct": args.lo_pct,
+                                "hi_pct": args.hi_pct},
+        }, indent=1))
+        n_tiles = len(list(tiles_dir.glob("*.png")))
+        print(f"\nREFERENCE BUILD: {len(all_segments)} squares x "
+              f"{args.reference_passes} passes = {len(order)} to count")
+        print(f"  squares: {', '.join(sorted({s['square'] for s in all_segments}))}")
+        print(f"  wrote {out} ({n_tiles} tiles)")
+        print("\n  Count all of them, press Download my counts, then:")
+        print("    /usr/bin/python3 analysis/make_reference.py <the _session.json>")
+        return
 
     anchors, blocks, skipped = assign_blocks(assignable, args.blocks, args.replicates,
                                              args.anchors, args.seed,
@@ -938,6 +1012,16 @@ def main():
               f"first with feedback")
         print(f"        held out of every counting set, so nobody counts a square "
               f"whose answer they were shown")
+        if args.gate_count or args.gate_location:
+            print(f"        gate: participants must reach "
+                  f"{100*args.gate_count:.0f}% on number and "
+                  f"{100*args.gate_location:.0f}% on location to start the real squares")
+        own = training.get("own_pairwise_f1")
+        if own is not None and own < args.gate_location:
+            print(f"        WARNING: the reference author's own passes agree at only "
+                  f"{own:.2f}, below the {args.gate_location:.2f} gate. Participants "
+                  f"would have to beat the reference's own repeatability. Lower "
+                  f"--gate-location or add more reference passes.")
     else:
         print("\nno --training-from: counters go straight to live data. "
               "Britten-Jones et al. (2022) found a consensus training round is "

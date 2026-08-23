@@ -1,0 +1,302 @@
+{
+ "schema": "sclera-count-manifest-v1",
+ "study": "SCLERA reference pass \u2014 field 1 \u2014 reference pass",
+ "built_by": "build_segments.py --reference-passes",
+ "endpoint": "",
+ "modes": {
+  "cells": {
+   "label": "Nuclei only",
+   "label_de": "Nur Zellkerne",
+   "prompt": "Click every nucleus on the Hoechst layer. Do not judge live or dead.",
+   "prompt_de": "Klicken Sie jeden Zellkern in der Hoechst-Ansicht an. Ohne Beurteilung von lebend oder tot.",
+   "default_layer": "nuclei",
+   "labels": [
+    {
+     "key": "cell",
+     "name": "Nucleus",
+     "name_de": "Zellkern",
+     "colour": "#f5c518",
+     "hotkey": "1"
+    }
+   ]
+  },
+  "livedead": {
+   "label": "Live / dead",
+   "label_de": "Lebend / tot",
+   "prompt": "Click every nucleus. A nucleus with EthD-1 on it is dead; one without is live.",
+   "prompt_de": "Klicken Sie jeden Zellkern an. Ein Kern mit EthD-1 ist tot, ein Kern ohne EthD-1 ist lebend.",
+   "default_layer": "merged",
+   "labels": [
+    {
+     "key": "live",
+     "name": "Live",
+     "name_de": "Lebend",
+     "colour": "#4da6ff",
+     "hotkey": "1"
+    },
+    {
+     "key": "dead",
+     "name": "Dead",
+     "name_de": "Tot",
+     "colour": "#ff4d6d",
+     "hotkey": "2"
+    },
+    {
+     "key": "unsure",
+     "name": "Unsure",
+     "name_de": "Unsicher",
+     "colour": "#f5c518",
+     "hotkey": "3"
+    }
+   ]
+  }
+ },
+ "layers": [
+  {
+   "key": "merged",
+   "name": "Merged",
+   "name_de": "\u00dcberlagert",
+   "hotkey": "q",
+   "hint": "blue = Hoechst (every nucleus), red = EthD-1 (dead)",
+   "hint_de": "blau = Hoechst (jeder Zellkern), rot = EthD-1 (tot)"
+  },
+  {
+   "key": "nuclei",
+   "name": "All nuclei",
+   "name_de": "Alle Zellkerne",
+   "hotkey": "w",
+   "hint": "Hoechst. Every spot is a nucleus - this is the TOTAL",
+   "hint_de": "Hoechst. Jeder Fleck ist ein Zellkern - das ist die GESAMTZAHL"
+  },
+  {
+   "key": "dead",
+   "name": "Dead only",
+   "name_de": "Nur tot",
+   "hotkey": "e",
+   "hint": "EthD-1. A spot here on top of a nucleus means that nucleus is DEAD",
+   "hint_de": "EthD-1. Ein Fleck hier auf einem Zellkern bedeutet: dieser Kern ist TOT"
+  }
+ ],
+ "fields": [
+  {
+   "field": 1,
+   "specimen": "006",
+   "region": "(from figure)",
+   "stack": "Image 11_z09.png",
+   "z": null,
+   "depth_um": null,
+   "source": "SCLERA_Detection_Analysis/manual_count_experiment/COUNT_field_1_grid.png",
+   "width": 1150,
+   "height": 1150,
+   "grid": {
+    "cols": [
+     "A",
+     "B",
+     "C",
+     "D",
+     "E",
+     "F",
+     "G",
+     "H"
+    ],
+    "rows": [
+     "1",
+     "2",
+     "3",
+     "4",
+     "5",
+     "6",
+     "7",
+     "8"
+    ]
+   },
+   "scheme": "hoechst",
+   "scheme_desc": "as rendered in the original figure",
+   "um_per_px": 0.7392,
+   "square_um": 106.3,
+   "built_from": "COUNT_field_*_grid.png panels A/B/C",
+   "grid_lines_removed": true,
+   "n_squares": 5
+  }
+ ],
+ "segments": [
+  {
+   "id": "f1_E1",
+   "field": 1,
+   "square": "E1",
+   "col": "E",
+   "row": "1",
+   "z": null,
+   "depth_um": null,
+   "location": "006/grid/Image 11_z09.png/E1",
+   "tile_w": 178,
+   "tile_h": 161,
+   "count_box": [
+    17,
+    0,
+    161,
+    144
+   ],
+   "tile_origin": [
+    558,
+    0
+   ],
+   "upscale": 1,
+   "layers": {
+    "merged": "tiles/f1_E1_merged.png",
+    "nuclei": "tiles/f1_E1_nuclei.png",
+    "dead": "tiles/f1_E1_dead.png"
+   }
+  },
+  {
+   "id": "f1_F2",
+   "field": 1,
+   "square": "F2",
+   "col": "F",
+   "row": "2",
+   "z": null,
+   "depth_um": null,
+   "location": "006/grid/Image 11_z09.png/F2",
+   "tile_w": 177,
+   "tile_h": 178,
+   "count_box": [
+    17,
+    17,
+    160,
+    161
+   ],
+   "tile_origin": [
+    702,
+    127
+   ],
+   "upscale": 1,
+   "layers": {
+    "merged": "tiles/f1_F2_merged.png",
+    "nuclei": "tiles/f1_F2_nuclei.png",
+    "dead": "tiles/f1_F2_dead.png"
+   }
+  },
+  {
+   "id": "f1_F4",
+   "field": 1,
+   "square": "F4",
+   "col": "F",
+   "row": "4",
+   "z": null,
+   "depth_um": null,
+   "location": "006/grid/Image 11_z09.png/F4",
+   "tile_w": 177,
+   "tile_h": 178,
+   "count_box": [
+    17,
+    17,
+    160,
+    161
+   ],
+   "tile_origin": [
+    702,
+    414
+   ],
+   "upscale": 1,
+   "layers": {
+    "merged": "tiles/f1_F4_merged.png",
+    "nuclei": "tiles/f1_F4_nuclei.png",
+    "dead": "tiles/f1_F4_dead.png"
+   }
+  },
+  {
+   "id": "f1_F5",
+   "field": 1,
+   "square": "F5",
+   "col": "F",
+   "row": "5",
+   "z": null,
+   "depth_um": null,
+   "location": "006/grid/Image 11_z09.png/F5",
+   "tile_w": 177,
+   "tile_h": 178,
+   "count_box": [
+    17,
+    17,
+    160,
+    161
+   ],
+   "tile_origin": [
+    702,
+    558
+   ],
+   "upscale": 1,
+   "layers": {
+    "merged": "tiles/f1_F5_merged.png",
+    "nuclei": "tiles/f1_F5_nuclei.png",
+    "dead": "tiles/f1_F5_dead.png"
+   }
+  },
+  {
+   "id": "f1_G6",
+   "field": 1,
+   "square": "G6",
+   "col": "G",
+   "row": "6",
+   "z": null,
+   "depth_um": null,
+   "location": "006/grid/Image 11_z09.png/G6",
+   "tile_w": 178,
+   "tile_h": 177,
+   "count_box": [
+    17,
+    17,
+    161,
+    160
+   ],
+   "tile_origin": [
+    845,
+    702
+   ],
+   "upscale": 1,
+   "layers": {
+    "merged": "tiles/f1_G6_merged.png",
+    "nuclei": "tiles/f1_G6_nuclei.png",
+    "dead": "tiles/f1_G6_dead.png"
+   }
+  }
+ ],
+ "anchors": [],
+ "blocks": {
+  "REF": [
+   "f1_G6",
+   "f1_E1",
+   "f1_F2",
+   "f1_F5",
+   "f1_F4",
+   "f1_F2",
+   "f1_F5",
+   "f1_G6",
+   "f1_F4",
+   "f1_E1",
+   "f1_E1",
+   "f1_F5",
+   "f1_F4",
+   "f1_G6",
+   "f1_F2"
+  ]
+ },
+ "training": null,
+ "match_um": 8.0,
+ "assignment": {
+  "reference_passes": 3,
+  "seed": 20260823
+ },
+ "tiling": {
+  "built_from": "grid_figure",
+  "context_margin_fraction": 0.12,
+  "upscale": 1,
+  "resample": "bicubic",
+  "z_um": 5.263
+ },
+ "display_stretch": {
+  "mode": "global",
+  "lo_pct": 1.0,
+  "hi_pct": 99.7
+ }
+}

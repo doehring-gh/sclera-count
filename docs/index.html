@@ -421,6 +421,25 @@
   </footer>
 </section>
 
+<!-- ============================ GATE ============================= -->
+<section id="gate" class="page hide">
+  <h1 id="gateTitle"></h1>
+  <p class="sub" id="gateLead"></p>
+  <div class="card">
+    <h2 data-i18n="gate.scores">Your practice scores</h2>
+    <table class="sum" id="gateScores"></table>
+  </div>
+  <div class="card">
+    <h2 data-i18n="gate.persquare">Square by square</h2>
+    <table class="sum" id="gateTable"></table>
+  </div>
+  <div id="gateAdvice" class="card hide"></div>
+  <div class="row">
+    <button class="primary" id="gateGo"></button>
+    <button id="gateReview" data-i18n="gate.review">Read the instructions again</button>
+  </div>
+</section>
+
 <!-- ============================ DONE ============================= -->
 <section id="done" class="page hide">
   <h1 data-i18n="done.title">Thank you</h1>
@@ -511,7 +530,23 @@ en: {
   "fb.relN":"<b>{n}</b> were labelled differently by each of you.",
   "fb.exact":"That matches the reference exactly.",
   "fb.legendHit":"you both found it","fb.legendMiss":"in the reference, you missed it",
-  "fb.next":"Got it, next square","fb.last":"Start the real squares",
+  "fb.next":"Got it, next square","fb.last":"See how you did",
+
+  "gate.passTitle":"Practice passed","gate.failTitle":"Not quite yet",
+  "gate.passLead":"You matched the reference closely enough. The real squares are next — there is no feedback from here on, so take your time.",
+  "gate.failLead":"You need {need}% on both scores to start the real squares. Practice again — the same squares, and you can use everything you just learned.",
+  "gate.scores":"Your practice scores","gate.persquare":"Square by square",
+  "gate.number":"Number of nuclei","gate.location":"Which nuclei (position)",
+  "gate.labels":"Live / dead labels","gate.attempt":"Attempt",
+  "gate.need":"need {n}%","gate.ok":"pass","gate.no":"below",
+  "gate.go":"Start the real squares","gate.retry":"Practice again",
+  "gate.review":"Read the instructions again",
+  "gate.thYou":"You","gate.thRef":"Reference","gate.thMissed":"Missed",
+  "gate.thExtra":"Extra","gate.thSquare":"Square",
+  "gate.adviceMiss":"You are <b>missing</b> nuclei the reference has. Turn the brightness up and zoom in — faint nuclei are easy to skip at low magnification.",
+  "gate.adviceExtra":"You are marking <b>more</b> than the reference. Bright specks in the background are not nuclei; a nucleus has a definite shape and body.",
+  "gate.adviceLabel":"You find the right nuclei, but you disagree on <b>live vs dead</b>. Flip to the dead-only view and check each nucleus there before labelling it.",
+  "gate.adviceShift":"Your marks are close but not on the nuclei. Click the middle of each nucleus, not its edge.",
 
   "sync.export":"export only","sync.notsent":"not sent yet","sync.sending":"sending…",
   "sync.sent":"sent ✓","sync.unconfirmed":"sent, not confirmed",
@@ -595,7 +630,23 @@ de: {
   "fb.relN":"<b>{n}</b> wurden von Ihnen beiden unterschiedlich beschriftet.",
   "fb.exact":"Das stimmt genau mit der Referenz überein.",
   "fb.legendHit":"von beiden gefunden","fb.legendMiss":"in der Referenz, von Ihnen übersehen",
-  "fb.next":"Verstanden, nächstes Quadrat","fb.last":"Mit den echten Quadraten beginnen",
+  "fb.next":"Verstanden, nächstes Quadrat","fb.last":"Ergebnis ansehen",
+
+  "gate.passTitle":"Übung bestanden","gate.failTitle":"Noch nicht ganz",
+  "gate.passLead":"Sie stimmen ausreichend genau mit der Referenz überein. Es folgen die echten Quadrate — ab hier gibt es keine Rückmeldung mehr, lassen Sie sich also Zeit.",
+  "gate.failLead":"Für den Start der echten Quadrate brauchen Sie {need} % in beiden Werten. Bitte üben Sie erneut — dieselben Quadrate, mit allem, was Sie gerade gelernt haben.",
+  "gate.scores":"Ihre Übungsergebnisse","gate.persquare":"Quadrat für Quadrat",
+  "gate.number":"Anzahl der Zellkerne","gate.location":"Welche Zellkerne (Position)",
+  "gate.labels":"Beschriftung lebend / tot","gate.attempt":"Versuch",
+  "gate.need":"nötig {n} %","gate.ok":"bestanden","gate.no":"darunter",
+  "gate.go":"Mit den echten Quadraten beginnen","gate.retry":"Erneut üben",
+  "gate.review":"Anleitung noch einmal lesen",
+  "gate.thYou":"Sie","gate.thRef":"Referenz","gate.thMissed":"Übersehen",
+  "gate.thExtra":"Zusätzlich","gate.thSquare":"Quadrat",
+  "gate.adviceMiss":"Ihnen <b>fehlen</b> Zellkerne, die die Referenz hat. Erhöhen Sie die Helligkeit und zoomen Sie hinein — schwache Kerne werden bei kleiner Vergrößerung leicht übersehen.",
+  "gate.adviceExtra":"Sie markieren <b>mehr</b> als die Referenz. Helle Sprenkel im Hintergrund sind keine Zellkerne; ein Kern hat eine klare Form und einen Körper.",
+  "gate.adviceLabel":"Sie finden die richtigen Zellkerne, weichen aber bei <b>lebend/tot</b> ab. Wechseln Sie in die Ansicht „Nur tot“ und prüfen Sie dort jeden Kern, bevor Sie ihn beschriften.",
+  "gate.adviceShift":"Ihre Markierungen liegen nahe, aber nicht auf den Kernen. Klicken Sie in die Mitte des Zellkerns, nicht an den Rand.",
 
   "sync.export":"nur Download","sync.notsent":"noch nicht gesendet","sync.sending":"wird gesendet…",
   "sync.sent":"gesendet ✓","sync.unconfirmed":"gesendet, nicht bestätigt",
@@ -766,6 +817,7 @@ function newSession(){
     study:M.study, rater:$("#rater").value.trim(), block, mode,
     started_utc:nowISO(), finished_utc:null, submitted_utc:null,
     n_training:train.length,
+    training_attempts:1, training_passed:false, training_score:null,
     order:[...train, ...M.blocks[block]],
     seg:{},
   };
@@ -825,6 +877,8 @@ function startCounting(resuming){
   idx = Math.max(0, segs.findIndex((s, i) => !state(keyAt(i)).done));
   if (idx === -1) idx = 0;
   for (let i = 0; i < idx; i++) reviewed.add(i);
+  if (M.training && (S.n_training || 0) && !S.training_passed && idx >= S.n_training)
+    idx = 0;                      // came back mid-run without having passed
   show();
 }
 
@@ -1059,10 +1113,146 @@ function showFeedback(){
   $("#fb").classList.remove("hide");
 }
 $("#fbNext").onclick = () => {
-  reviewed.add(idx); fbShowing = false; $("#fb").classList.add("hide"); go(1);
+  reviewed.add(idx); fbShowing = false; $("#fb").classList.add("hide");
+  if (idx + 1 >= (S.n_training || 0)) { showGate(); return; }
+  go(1);
+};
+
+/* ---------------------------------------------------------------- the gate
+   A participant has to reproduce the reference on the practice squares before
+   any of their real counts are kept. Two separate scores, because they fail for
+   different reasons and need different advice:
+
+     number    did you find the right NUMBER of nuclei, summed over the squares
+     location  were they the SAME nuclei, matched by position within the radius
+
+   Number alone is not enough: marking ten wrong things scores 100% on count and
+   nothing on location. Location alone is not enough either, because it ignores
+   a systematic tendency to over- or under-count. Both must clear the bar.       */
+function gateConfig(){
+  const g = (M.training && M.training.gate) || {};
+  return {count: g.min_count_accuracy ?? 0.90,
+          loc:   g.min_location_f1   ?? 0.90,
+          maxAttempts: g.max_attempts ?? 0};
+}
+
+function scoreTraining(){
+  let you = 0, ref = 0, matched = 0, missed = 0, extra = 0, relabelled = 0;
+  const rows = [];
+  for (let i = 0; i < (S.n_training || 0); i++) {
+    const seg = segs[i], st = state(keyAt(i));
+    const m = matchToReference(seg.id, st.marks);
+    you += st.marks.length; ref += m.nRef;
+    matched += m.matched; missed += m.missed; extra += m.extra;
+    relabelled += m.relabelled;
+    rows.push({square: seg.square || seg.id, you: st.marks.length, ref: m.nRef,
+               missed: m.missed, extra: m.extra, relabelled: m.relabelled});
+  }
+  const denom = 2 * matched + missed + extra;
+  return {
+    you, ref, matched, missed, extra, relabelled, rows,
+    // how close the totals are, penalised in either direction
+    count: ref ? Math.max(0, 1 - Math.abs(you - ref) / ref) : (you ? 0 : 1),
+    loc: denom ? 2 * matched / denom : 1,
+    label: matched ? 1 - relabelled / matched : 1,
+  };
+}
+
+function showGate(){
+  leaveSeg();
+  const cfg = gateConfig(), sc = scoreTraining();
+  // Counted on retries, not on arrivals: reaching this screen twice without
+  // re-doing the practice (clicking Next again on the last square) is not a
+  // second attempt, and must not look like one in the results.
+  S.training_attempts = S.training_attempts || 1;
+  S.training_score = {count: +sc.count.toFixed(4), location: +sc.loc.toFixed(4),
+                      label: +sc.label.toFixed(4), attempt: S.training_attempts};
+  const passed = sc.count >= cfg.count && sc.loc >= cfg.loc;
+  S.training_passed = passed;
+  save();
+
+  $("#count").classList.remove("on");
+  $("#gate").classList.remove("hide");
+  $("#lang").style.display = "";
+  window.scrollTo(0, 0);
+
+  const pct = v => (100 * v).toFixed(0) + "%";
+  const mark = (v, need) => v >= need
+    ? `<b style="color:var(--good)">${pct(v)}</b> · ${t("gate.ok")}`
+    : `<b style="color:var(--bad)">${pct(v)}</b> · ${t("gate.no")} ${pct(need)}`;
+
+  $("#gateTitle").textContent = passed ? t("gate.passTitle") : t("gate.failTitle");
+  $("#gateLead").textContent = passed ? t("gate.passLead")
+                                      : t("gate.failLead", {need:(100*cfg.count).toFixed(0)});
+  $("#gateScores").innerHTML =
+    `<tr><th>${t("gate.number")}</th><td>${mark(sc.count, cfg.count)}</td></tr>` +
+    `<tr><th>${t("gate.location")}</th><td>${mark(sc.loc, cfg.loc)}</td></tr>` +
+    (S.mode === "livedead"
+      ? `<tr><th>${t("gate.labels")}</th><td>${pct(sc.label)}</td></tr>` : "") +
+    `<tr><th>${t("gate.attempt")}</th><td>${S.training_attempts}</td></tr>`;
+
+  $("#gateTable").innerHTML =
+    `<tr><th>${t("gate.thSquare")}</th><th>${t("gate.thYou")}</th>` +
+    `<th>${t("gate.thRef")}</th><th>${t("gate.thMissed")}</th>` +
+    `<th>${t("gate.thExtra")}</th></tr>` +
+    sc.rows.map(r => `<tr><td>${r.square}</td><td>${r.you}</td><td>${r.ref}</td>` +
+      `<td>${r.missed || ""}</td><td>${r.extra || ""}</td></tr>`).join("");
+
+  // one piece of advice, aimed at whatever actually went wrong
+  const adv = $("#gateAdvice");
+  if (passed) { adv.classList.add("hide"); }
+  else {
+    let key = "gate.adviceMiss";
+    if (sc.extra > sc.missed * 1.5) key = "gate.adviceExtra";
+    else if (sc.missed > sc.extra * 1.5) key = "gate.adviceMiss";
+    else if (sc.count >= cfg.count && sc.loc < cfg.loc) key = "gate.adviceShift";
+    if (sc.loc >= cfg.loc && sc.label < 0.9 && S.mode === "livedead")
+      key = "gate.adviceLabel";
+    adv.innerHTML = t(key);
+    adv.classList.remove("hide");
+  }
+
+  $("#gateGo").textContent = passed ? t("gate.go") : t("gate.retry");
+  $("#gateGo").onclick = passed ? leaveGatePass : retryTraining;
+}
+
+function leaveGatePass(){
+  $("#gate").classList.add("hide");
+  $("#count").classList.add("on");
+  $("#lang").style.display = "none";
+  idx = S.n_training || 0;
+  show();
+}
+
+function retryTraining(){
+  // wipe the practice answers so the next attempt is a real attempt, and let
+  // the feedback screens run again
+  S.training_attempts = (S.training_attempts || 1) + 1;
+  for (let i = 0; i < (S.n_training || 0); i++) delete S.seg[keyAt(i)];
+  reviewed = new Set();
+  save();
+  $("#gate").classList.add("hide");
+  $("#count").classList.add("on");
+  $("#lang").style.display = "none";
+  idx = 0;
+  show();
+}
+
+$("#gateReview").onclick = () => {
+  $("#gate").classList.add("hide");
+  $("#learn").classList.remove("hide");
+  renderLearn(); window.scrollTo(0, 0);
+  $("#btnLearnBack").classList.add("hide");
+  $("#btnLearnGo").textContent = t("gate.review");
+  $("#btnLearnGo").onclick = () => {
+    $("#learn").classList.add("hide"); $("#gate").classList.remove("hide");
+  };
 };
 
 function go(d){
+  // the only way past the practice squares is through the gate
+  if (d > 0 && M.training && isTraining(idx) && idx + 1 >= (S.n_training || 0)
+      && reviewed.has(idx) && !S.training_passed) { showGate(); return; }
   if (d > 0 && isTraining(idx) && !reviewed.has(idx) && M.training) {
     leaveSeg(); state(keyAt(idx)).done = true; save(); showFeedback(); return;
   }
@@ -1230,6 +1420,9 @@ function rows(){
       empty:st.empty ? 1 : 0, seconds:st.seconds,
       brightness:st.bri, contrast:st.con, note:st.note.replace(/[\r\n]+/g," "),
       app_version:APP_VERSION, started_utc:S.started_utc,
+      training_attempts:S.training_attempts ?? "",
+      training_count_score:S.training_score ? S.training_score.count : "",
+      training_location_score:S.training_score ? S.training_score.location : "",
     });
   });
   return out;
