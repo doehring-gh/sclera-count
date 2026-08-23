@@ -112,60 +112,113 @@ SCHEMES = {
 
 LAYERS_BY_SCHEME = {
     "hoechst": [
-        {"key": "merged", "name": "Merged", "hotkey": "q",
-         "hint": "blue = Hoechst (every nucleus), red = EthD-1 (dead)"},
-        {"key": "nuclei", "name": "All nuclei", "hotkey": "w",
-         "hint": "Hoechst. Every spot is a nucleus - this is the TOTAL"},
-        {"key": "dead", "name": "Dead only", "hotkey": "e",
-         "hint": "EthD-1. A spot here on top of a nucleus means that nucleus is DEAD"},
+        {"key": "merged", "name": "Merged", "name_de": "Überlagert", "hotkey": "q",
+         "hint": "blue = Hoechst (every nucleus), red = EthD-1 (dead)",
+         "hint_de": "blau = Hoechst (jeder Zellkern), rot = EthD-1 (tot)"},
+        {"key": "nuclei", "name": "All nuclei", "name_de": "Alle Zellkerne", "hotkey": "w",
+         "hint": "Hoechst. Every spot is a nucleus - this is the TOTAL",
+         "hint_de": "Hoechst. Jeder Fleck ist ein Zellkern - das ist die GESAMTZAHL"},
+        {"key": "dead", "name": "Dead only", "name_de": "Nur tot", "hotkey": "e",
+         "hint": "EthD-1. A spot here on top of a nucleus means that nucleus is DEAD",
+         "hint_de": "EthD-1. Ein Fleck hier auf einem Zellkern bedeutet: dieser Kern ist TOT"},
     ],
     "calcein": [
-        {"key": "merged", "name": "Merged", "hotkey": "q",
-         "hint": "green = calcein (live), red = EthD-1 (dead)"},
-        {"key": "live", "name": "Live only", "hotkey": "w",
-         "hint": "calcein. Live cells, stained through the cytoplasm"},
-        {"key": "dead", "name": "Dead only", "hotkey": "e",
-         "hint": "EthD-1. Dead nuclei"},
+        {"key": "merged", "name": "Merged", "name_de": "Überlagert", "hotkey": "q",
+         "hint": "green = calcein (live), red = EthD-1 (dead)",
+         "hint_de": "grün = Calcein (lebend), rot = EthD-1 (tot)"},
+        {"key": "live", "name": "Live only", "name_de": "Nur lebend", "hotkey": "w",
+         "hint": "calcein. Live cells, stained through the cytoplasm",
+         "hint_de": "Calcein. Lebende Zellen, im Zytoplasma angefärbt"},
+        {"key": "dead", "name": "Dead only", "name_de": "Nur tot", "hotkey": "e",
+         "hint": "EthD-1. Dead nuclei", "hint_de": "EthD-1. Tote Zellkerne"},
     ],
 }
 
 _LD = [
-    {"key": "live", "name": "Live", "colour": "#4da6ff", "hotkey": "1"},
-    {"key": "dead", "name": "Dead", "colour": "#ff4d6d", "hotkey": "2"},
-    {"key": "unsure", "name": "Unsure", "colour": "#f5c518", "hotkey": "3"},
+    {"key": "live", "name": "Live", "name_de": "Lebend", "colour": "#4da6ff", "hotkey": "1"},
+    {"key": "dead", "name": "Dead", "name_de": "Tot", "colour": "#ff4d6d", "hotkey": "2"},
+    {"key": "unsure", "name": "Unsure", "name_de": "Unsicher", "colour": "#f5c518", "hotkey": "3"},
 ]
 
 MODES_BY_SCHEME = {
     "hoechst": {
         "cells": {
-            "label": "Nuclei only",
+            "label": "Nuclei only", "label_de": "Nur Zellkerne",
             "prompt": "Click every nucleus on the Hoechst layer. Do not judge live or dead.",
+            "prompt_de": "Klicken Sie jeden Zellkern in der Hoechst-Ansicht an. "
+                         "Ohne Beurteilung von lebend oder tot.",
             "default_layer": "nuclei",
-            "labels": [{"key": "cell", "name": "Nucleus", "colour": "#f5c518", "hotkey": "1"}],
+            "labels": [{"key": "cell", "name": "Nucleus", "name_de": "Zellkern",
+                        "colour": "#f5c518", "hotkey": "1"}],
         },
         "livedead": {
-            "label": "Live / dead",
+            "label": "Live / dead", "label_de": "Lebend / tot",
             "prompt": "Click every nucleus. A nucleus with EthD-1 on it is dead; "
                       "one without is live.",
-            "default_layer": "merged",
-            "labels": _LD,
+            "prompt_de": "Klicken Sie jeden Zellkern an. Ein Kern mit EthD-1 ist tot, "
+                         "ein Kern ohne EthD-1 ist lebend.",
+            "default_layer": "merged", "labels": _LD,
         },
     },
     "calcein": {
         "cells": {
-            "label": "Cells only",
+            "label": "Cells only", "label_de": "Nur Zellen",
             "prompt": "Click every cell you can see, live or dead, without classifying it.",
+            "prompt_de": "Klicken Sie jede erkennbare Zelle an, lebend oder tot, "
+                         "ohne sie einzuordnen.",
             "default_layer": "merged",
-            "labels": [{"key": "cell", "name": "Cell", "colour": "#f5c518", "hotkey": "1"}],
+            "labels": [{"key": "cell", "name": "Cell", "name_de": "Zelle",
+                        "colour": "#f5c518", "hotkey": "1"}],
         },
         "livedead": {
-            "label": "Live / dead",
+            "label": "Live / dead", "label_de": "Lebend / tot",
             "prompt": "Click every cell: green calcein means live, red EthD-1 means dead.",
-            "default_layer": "merged",
-            "labels": _LD,
+            "prompt_de": "Klicken Sie jede Zelle an: grünes Calcein = lebend, "
+                         "rotes EthD-1 = tot.",
+            "default_layer": "merged", "labels": _LD,
         },
     },
 }
+
+
+def apply_config(path):
+    """Load a study config and override the built-in defaults.
+
+    This is what makes the app reusable for a different stain, a different
+    tissue or a different depth range without touching any code. Everything the
+    build assumes about the images lives here: where they are, how they are
+    named, which channel carries which dye, how the grid is cut, and the wording
+    the counters see in both languages.
+
+    See study.example.json. Any key may be omitted; omitted keys keep their
+    default. Wording supplied here is merged into the built-in tables, so you can
+    override just one hint without restating all of them.
+    """
+    global CONFOCAL, COLS, ROWS, Z_UM, FIELD_WIDTH_UM, DEFAULT_STACKS
+    cfg = json.loads(Path(path).read_text())
+
+    if "source_root" in cfg:
+        CONFOCAL = (REPO / cfg["source_root"]) if not Path(cfg["source_root"]).is_absolute()                    else Path(cfg["source_root"])
+    if "grid" in cfg:
+        COLS = "".join(cfg["grid"].get("cols", COLS))
+        ROWS = "".join(str(r) for r in cfg["grid"].get("rows", ROWS))
+    Z_UM = float(cfg.get("z_um", Z_UM))
+    FIELD_WIDTH_UM = float(cfg.get("field_width_um", FIELD_WIDTH_UM))
+    if "stacks" in cfg:
+        DEFAULT_STACKS = cfg["stacks"]
+
+    for name, sc in (cfg.get("schemes") or {}).items():
+        base = dict(SCHEMES.get(name, {"nuclei": None, "dead": None, "live": None}))
+        base.update({k: v for k, v in sc.items()
+                     if k in ("desc", "nuclei", "dead", "live")})
+        SCHEMES[name] = base
+        if "layers" in sc:
+            LAYERS_BY_SCHEME[name] = sc["layers"]
+        if "modes" in sc:
+            MODES_BY_SCHEME[name] = sc["modes"]
+        LAYERS_BY_SCHEME.setdefault(name, LAYERS_BY_SCHEME["hoechst"])
+        MODES_BY_SCHEME.setdefault(name, MODES_BY_SCHEME["hoechst"])
+    return cfg
 
 
 # --------------------------------------------------------------------- sources
@@ -418,15 +471,17 @@ def find_panels(a):
     green = (a[..., 1] > 110) & (a[..., 0] < 90) & (a[..., 2] < 90)
     # A grid line runs the full extent of its panel; the green A1..H8 cell labels
     # are short. Requiring half the figure's extent keeps lines and drops labels.
+    nx, ny = len(COLS) - 1, len(ROWS) - 1
     xs = [c for c, _ in _runs(green.sum(0) > H * 0.50)]
     ys = [r for r, _ in _runs(green.sum(1) > W * 0.50)]
-    if len(xs) != 21:
-        raise SystemExit(f"expected 21 vertical grid lines (3 panels x 7), found {len(xs)}")
-    if len(ys) != 7:
-        raise SystemExit(f"expected 7 horizontal grid lines, found {len(ys)}: {ys}")
-    pitch = (xs[6] - xs[0]) / 6.0
-    top, bot = ys[0] - pitch, ys[6] + pitch
-    panels = [(xs[k * 7] - pitch, top, xs[k * 7 + 6] + pitch, bot) for k in range(3)]
+    if len(xs) != nx * 3:
+        raise SystemExit(f"expected {nx*3} vertical grid lines (3 panels x {nx}), "
+                         f"found {len(xs)}")
+    if len(ys) != ny:
+        raise SystemExit(f"expected {ny} horizontal grid lines, found {len(ys)}: {ys}")
+    pitch = (xs[nx - 1] - xs[0]) / (nx - 1)
+    top, bot = ys[0] - pitch, ys[ny - 1] + pitch
+    panels = [(xs[k * nx] - pitch, top, xs[k * nx + nx - 1] + pitch, bot) for k in range(3)]
     return panels, pitch, green
 
 
@@ -649,6 +704,11 @@ def insert_repeats(order, fraction, rng, min_gap=12):
 def main():
     p = argparse.ArgumentParser(description=__doc__,
                                 formatter_class=argparse.RawDescriptionHelpFormatter)
+    p.add_argument("--config", default="",
+                   help="study config JSON: source folder, stacks, grid, dye channels "
+                        "and the wording counters see. This is how you point the app "
+                        "at a different stain, tissue or depth range without editing "
+                        "code. See study.example.json")
     p.add_argument("--study", default="SCLERA-LIVE manual count v2")
     p.add_argument("--stacks", default="",
                    help="comma-separated specimen/Image N, e.g. '003/Image 5,006/Image 11'. "
@@ -709,6 +769,17 @@ def main():
     p.add_argument("--out", default="docs", help="output directory (default docs/)")
     p.add_argument("--clean", action="store_true", help="wipe the tiles directory first")
     args = p.parse_args()
+
+    cfg = apply_config(args.config) if args.config else {}
+    if cfg.get("study") and args.study == p.get_default("study"):
+        args.study = cfg["study"]
+    if cfg.get("z_levels") and args.z_levels == p.get_default("z_levels"):
+        args.z_levels = ",".join(str(z) for z in cfg["z_levels"])
+    if cfg.get("scheme") and args.scheme == p.get_default("scheme"):
+        args.scheme = cfg["scheme"]
+    if args.scheme not in SCHEMES:
+        raise SystemExit(f"unknown scheme {args.scheme!r}; "
+                         f"known: {', '.join(sorted(SCHEMES))}")
 
     docs = APP_DIR / args.out
     tiles_dir = docs / "tiles"
@@ -843,6 +914,8 @@ def main():
     per_block = len(next(iter(blocks.values())))
     mins = per_block * args.seconds_per_square / 60.0
 
+    if args.config:
+        print(f"\nconfig: {args.config}")
     print(f"\nwrote {out}  ({len(all_segments)} segments, sha256:{digest})")
     print(f"tiles: {n_tiles} files, {size_mb:.1f} MB")
     first = next(iter(blocks.values()))

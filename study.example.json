@@ -1,0 +1,132 @@
+{
+  "_README": [
+    "Copy this to study.json, edit, and run:",
+    "    /usr/bin/python3 build_segments.py --config study.json --clean",
+    "",
+    "Everything the build assumes about your images lives in this one file:",
+    "where they are, how they are named, which channel holds which dye, how the",
+    "grid is cut, and the exact wording counters read in English and German.",
+    "Point it at a different stain, a different tissue or a different depth",
+    "range without touching any code.",
+    "",
+    "Every key is optional. Anything you leave out keeps its built-in default,",
+    "and command-line flags still override this file.",
+    "",
+    "Keys ending _de are the German text. If one is missing the English is used,",
+    "so you can translate incrementally."
+  ],
+
+  "study": "SCLERA-LIVE manual count v2",
+
+  "_source": "Folder holding the images, relative to the Sclera project folder.",
+  "source_root": "confocal",
+
+  "_stacks": [
+    "Which z-stacks to use. Each is <specimen>/<image stem>; the region folder is",
+    "found automatically. Files must be named '<image> _zNN.png', e.g.",
+    "confocal/003/1/Image 5_z07.png -> {specimen: 003, image: Image 5}."
+  ],
+  "stacks": [
+    {"specimen": "006", "image": "Image 11"},
+    {"specimen": "006", "image": "Image 5"},
+    {"specimen": "003", "image": "Image 5"},
+    {"specimen": "003", "image": "Image 21"},
+    {"specimen": "003", "image": "Image 8"}
+  ],
+
+  "_z_levels": [
+    "Which slices to sample from every stack. Stacks here run z00..z19 at",
+    "5.263 um, so 5,9,13,17 spans about 26-89 um. Use a denser ladder near the",
+    "depth where counting starts to fail if that is the question."
+  ],
+  "z_levels": [5, 9, 13, 17],
+  "z_um": 5.263,
+
+  "_grid": "How each field is divided. 8 columns x 8 rows = 64 squares.",
+  "grid": {
+    "cols": ["A", "B", "C", "D", "E", "F", "G", "H"],
+    "rows": ["1", "2", "3", "4", "5", "6", "7", "8"]
+  },
+
+  "_field_width_um": "Physical width of one field, from calibration.yaml. Sets the micron scale.",
+  "field_width_um": 850.10,
+
+  "_scheme": "Which staining scheme below to build with.",
+  "scheme": "hoechst",
+
+  "_schemes": [
+    "Add an entry here for a new stain. 'nuclei', 'dead' and 'live' name the RGB",
+    "channel each dye sits in; set the ones your stain has and leave the rest null.",
+    "",
+    "Only a stain that labels EVERY cell (like Hoechst) can support a 'count the",
+    "total' task. With a stain that marks only a subset there is no denominator,",
+    "so offer the live/dead style task instead.",
+    "",
+    "'layers' are the views a counter can switch between; the keys must be",
+    "'merged' plus whichever of nuclei/live/dead your channels define.",
+    "'modes' are the counting tasks offered on the start screen."
+  ],
+  "schemes": {
+    "hoechst": {
+      "desc": {
+        "en": "Hoechst 33342 (all nuclei) + ethidium homodimer-1 (dead)",
+        "de": "Hoechst 33342 (alle Zellkerne) + Ethidiumhomodimer-1 (tot)"
+      },
+      "nuclei": "B",
+      "dead": "R",
+      "live": null
+    },
+
+    "_example_new_stain": {
+      "_comment": [
+        "A worked example: DAPI nuclei in blue plus a propidium iodide dead",
+        "marker in red. Rename the key, drop the underscore, and set",
+        "\"scheme\": \"dapi_pi\" above to use it."
+      ],
+      "desc": {
+        "en": "DAPI (all nuclei) + propidium iodide (dead)",
+        "de": "DAPI (alle Zellkerne) + Propidiumiodid (tot)"
+      },
+      "nuclei": "B",
+      "dead": "R",
+      "live": null,
+      "layers": [
+        {"key": "merged", "hotkey": "q",
+         "name": "Merged", "name_de": "Überlagert",
+         "hint": "blue = DAPI (every nucleus), red = PI (dead)",
+         "hint_de": "blau = DAPI (jeder Zellkern), rot = PI (tot)"},
+        {"key": "nuclei", "hotkey": "w",
+         "name": "All nuclei", "name_de": "Alle Zellkerne",
+         "hint": "DAPI. Every spot is a nucleus - this is the TOTAL",
+         "hint_de": "DAPI. Jeder Fleck ist ein Zellkern - das ist die GESAMTZAHL"},
+        {"key": "dead", "hotkey": "e",
+         "name": "Dead only", "name_de": "Nur tot",
+         "hint": "PI. A spot here on a nucleus means that nucleus is DEAD",
+         "hint_de": "PI. Ein Fleck hier auf einem Zellkern bedeutet: dieser Kern ist TOT"}
+      ],
+      "modes": {
+        "cells": {
+          "label": "Nuclei only", "label_de": "Nur Zellkerne",
+          "prompt": "Click every nucleus on the DAPI layer. Do not judge live or dead.",
+          "prompt_de": "Klicken Sie jeden Zellkern in der DAPI-Ansicht an. Ohne Beurteilung von lebend oder tot.",
+          "default_layer": "nuclei",
+          "labels": [
+            {"key": "cell", "name": "Nucleus", "name_de": "Zellkern",
+             "colour": "#f5c518", "hotkey": "1"}
+          ]
+        },
+        "livedead": {
+          "label": "Live / dead", "label_de": "Lebend / tot",
+          "prompt": "Click every nucleus. A nucleus with PI on it is dead; one without is live.",
+          "prompt_de": "Klicken Sie jeden Zellkern an. Ein Kern mit PI ist tot, ein Kern ohne PI ist lebend.",
+          "default_layer": "merged",
+          "labels": [
+            {"key": "live", "name": "Live", "name_de": "Lebend", "colour": "#4da6ff", "hotkey": "1"},
+            {"key": "dead", "name": "Dead", "name_de": "Tot", "colour": "#ff4d6d", "hotkey": "2"},
+            {"key": "unsure", "name": "Unsure", "name_de": "Unsicher", "colour": "#f5c518", "hotkey": "3"}
+          ]
+        }
+      }
+    }
+  }
+}
