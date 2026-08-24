@@ -301,6 +301,48 @@ on how the papers are eventually split.
 
 ---
 
+## 7c. Why an automated tool (ImageJ or ours) does not settle this
+
+Raised by Torsten Bossing, 2026-08-24: *"Why do you want to re-invent what ImageJ
+can do since 2 decades?"* The answer is not that ImageJ is inadequate.
+
+**ImageJ is a toolbox, not a method, and it cannot validate itself.** Whatever it
+produces is a number with no error bar. The only way to know whether it is right
+is to compare it against human counts — so "use ImageJ" presupposes the thing
+this study measures.
+
+**Concede immediately if raised:** ImageJ's Cell Counter plugin already does
+click-counting with coordinates. It could do the counting; it could not run the
+study — 20 people without installation on phones and tablets in two languages, an
+*identical* display transform for everyone (in ImageJ each person sets their own
+brightness, so you would measure their contrast choices), the enforced edge rule,
+hidden repeats, blinding to depth, and the training gate.
+
+**Failure modes that any threshold-based workflow inherits**, all measured rather
+than asserted:
+
+- Independent thresholding of the two channels yields more dead objects than
+  nuclei in **60.6% of optical sections** (v4 audit); the standard
+  threshold-both-then-subtract workflow does exactly this.
+- Per-image normalisation manufactures nuclei on blank fields (~54 phantom
+  objects, v4). Reproduced independently here: the draft detector found 12 nuclei
+  in square F2 where two observers both counted 5.
+- Adaptive and Li thresholding over-count background by up to **~2,800% at low
+  density** (v4) — sclera is sparsely cellular, and methods validated on
+  confluent culture do not transfer.
+- Autofluorescence can defeat the assay outright: Stoddart 2006 found bone
+  autofluorescence made fluorescent live/dead assessment of osteocytes impossible.
+
+**The argument to lead with**, because it is ours and nobody has it: the
+depth-dependent detection bias in §4. No software warns about it, ImageJ included.
+
+**Do not argue** that ImageJ is inaccurate or outdated. The winning argument is
+that the field validates automated counts against manual counts, nobody has
+checked whether manual counts are reproducible on this tissue, and two capable
+observers differ by 30 points of viability on identical images.
+
+---
+
 ## 8. Open questions
 
 1. **Staining** — keep Hoechst/EthD-1? Any far-red all-nuclei option that survives
