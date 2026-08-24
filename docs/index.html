@@ -552,6 +552,7 @@ en: {
   "sync.export":"export only","sync.notsent":"not sent yet","sync.sending":"sending…",
   "sync.sent":"sent ✓","sync.unconfirmed":"sent, not confirmed",
   "sync.refused":"the server refused it — download instead",
+  "sync.notauth":"link not recognised — download and email instead",
   "sync.failed":"send failed — download instead",
 
   "done.title":"Thank you","done.what":"What you counted",
@@ -653,6 +654,7 @@ de: {
   "sync.export":"nur Download","sync.notsent":"noch nicht gesendet","sync.sending":"wird gesendet…",
   "sync.sent":"gesendet ✓","sync.unconfirmed":"gesendet, nicht bestätigt",
   "sync.refused":"Der Server hat die Daten abgelehnt — bitte herunterladen",
+  "sync.notauth":"Link nicht erkannt — bitte herunterladen und mailen",
   "sync.failed":"Senden fehlgeschlagen — bitte herunterladen",
 
   "done.title":"Vielen Dank","done.what":"Ihre Zählung",
@@ -715,6 +717,7 @@ let view = {x:0, y:0, k:1};
 let segEnteredAt = 0;
 let reviewed = new Set();
 let IMGS = {};
+let ACCESS_KEY = "";      // from ?key= in the emailed link; authorises the write
 const LS_KEY = "sclera-count-session-v1";
 
 const nowISO = () => new Date().toISOString();
@@ -748,6 +751,15 @@ async function boot(){
     if (r) r.checked = true;
   }
   if (q.get("rater")) $("#rater").value = q.get("rater");
+  // Access key travels in the emailed link only -- never in manifest.json, which
+  // is served publicly. Kept out of the URL bar after boot so it is less likely
+  // to be copied around by accident.
+  ACCESS_KEY = q.get("key") || "";
+  if (ACCESS_KEY && history.replaceState) {
+    q.delete("key");
+    const clean = location.pathname + (q.toString() ? "?" + q.toString() : "");
+    history.replaceState(null, "", clean);
+  }
 
   setSync(M.endpoint ? t("sync.notsent") : t("sync.export"), "");
   $("#rater").addEventListener("input", checkStart);
@@ -818,6 +830,7 @@ function newSession(){
     schema:"sclera-count-v1", app_version:APP_VERSION, lang:LANG,
     study:M.study, rater:$("#rater").value.trim(), block, mode,
     started_utc:nowISO(), finished_utc:null, submitted_utc:null,
+    key:ACCESS_KEY,
     n_training:train.length,
     training_attempts:1, training_passed:false, training_score:null,
     order:[...train, ...M.blocks[block]],
@@ -838,8 +851,9 @@ function offerResume(){
     rater:prev.rater, block:prev.block,
     mode:mt(M.modes[prev.mode],"label").toLowerCase(),
     done, total:prev.order.length});
-  $("#btnResume").onclick = () => { S = prev; LANG = prev.lang || LANG; applyLang();
-                                    startCounting(true); };
+  $("#btnResume").onclick = () => { S = prev; LANG = prev.lang || LANG;
+                                    if (ACCESS_KEY) S.key = ACCESS_KEY;
+                                    applyLang(); startCounting(true); };
   $("#btnDiscard").onclick = () => {
     if (confirm(t("resume.confirm"))) {
       localStorage.removeItem(LS_KEY); $("#resume").classList.add("hide");
@@ -1495,7 +1509,9 @@ async function submit(){
     const outj = await res.json();
     if (outj && outj.ok) { S.submitted_utc = nowISO(); save();
                            setSync(t("sync.sent"), "ok"); return "ok"; }
-    setSync(t("sync.refused"), "err"); return "failed";
+    setSync(outj && outj.error === "not authorised" ? t("sync.notauth")
+                                                    : t("sync.refused"), "err");
+    return "failed";
   } catch (e) {
     try {
       await fetch(M.endpoint, {...opts, mode:"no-cors"});

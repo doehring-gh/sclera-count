@@ -264,8 +264,22 @@ replaces earlier rows rather than duplicating them.
 server; writing to the repository from the page would require a write-scoped token
 embedded in a public page.
 
-The endpoint URL is public in `manifest.json` by necessity. Undeploy the web app
-once collection is finished.
+**What is and is not exposed.** The spreadsheet is private and the script has no
+read path — `doGet` returns a fixed banner whatever it is asked, verified by
+probing it. Nobody can read the data. The endpoint URL is public in
+`manifest.json` by necessity, so the exposure is *write-spam*, not disclosure.
+
+**Closed with per-counter access keys (2026-08-24).** Each counter's link carries
+`&key=...`; `ACCESS_KEYS` in `Code.gs` maps key to name. The key travels only in
+the emailed link, never in the published site, and the app strips it from the URL
+bar after boot. The row is stamped with the name the key maps to, **not** the name
+typed into the app — verified: a session typing "Someone Else" with Matt's key was
+recorded as Matt. A request with no key is refused and the counter is told to
+download and email instead. Keys are access control, not cryptography: they sit in
+browser history and work for anyone the link is forwarded to. Leave `ACCESS_KEYS`
+empty to accept anything, which keeps already-sent links working.
+
+Undeploy the web app once collection is finished.
 
 Two test rows were written during setup and should be deleted from the Sheet:
 `__TEST__` and `CONNECTIVITY_CHECK`.
