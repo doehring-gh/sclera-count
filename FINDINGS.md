@@ -227,6 +227,44 @@ Recorded because the corrections are part of the method.
 
 ---
 
+## 7b. Where this study sits in SCLERA-LIVE
+
+The parent project is **SCLERA-LIVE**. The methods manuscript
+(`SCLERA_Detection_Analysis/SCLERA-LIVE_viability_methods_manuscript_v4.md`,
+Courtecuisse, Oehring, Kyte, Zabihi, Glebov, Bossing, Elsheikh — target *Journal
+of Microscopy*) already names this counting study as its own most important
+outstanding work:
+
+> "**No hand-annotated real-tissue ground truth.** The synthetic benchmark
+> validates counting when truth is known but does not prove the pipeline counts
+> *sclera* correctly. The most valuable outstanding experiment is manual
+> annotation of ≥3 real fields by ≥2 observers, giving precision/recall and
+> inter-observer agreement of Otsu (and of the co-localisation rule) against
+> human counts." — v4, Limitations
+
+Two of the paper's headline parameters are explicitly waiting on it: the
+co-localisation overlap threshold (0.50) and the absolute-intensity noise floor
+(50/255), both currently fixed against *synthetic* ground truth only.
+
+**Ethics scope follows from this.** The tissue side is already settled — v4 §2.1
+records that porcine eyes were an abattoir food-chain by-product, no animals were
+killed for the study, and "ethical review confirmed no licence required". The new
+application is therefore **only** about the human observers: what they are asked
+to do, what is recorded about them, and how they withdraw.
+
+The four experts are collaborators contributing a reference standard rather than
+participants; two (Glebov, Bossing) are already co-authors on v4. Only the ~20
+counters are participants, and they are anonymous by design (§9).
+
+**A caution on comparing numbers.** The audited pipeline reports ~48% viability
+for specimens 003/004. The crude dead fractions in §4 of this document (72–74% for
+003 at z05) are **not** comparable: that measure samples peaks in the nuclear
+channel and asks whether EthD-1 is bright there, without enforcing the 50%
+co-localisation rule the paper shows is essential. It over-calls dead in exactly
+the way v4 predicts, which is a consistency check rather than a contradiction.
+
+---
+
 ## 8. Open questions
 
 1. **Staining** — keep Hoechst/EthD-1? Any far-red all-nuclei option that survives
