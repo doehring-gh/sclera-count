@@ -16,6 +16,7 @@
      "name": "Nucleus",
      "name_de": "Zellkern",
      "colour": "#f5c518",
+     "shape": "circle",
      "hotkey": "1"
     }
    ]
@@ -23,15 +24,16 @@
   "livedead": {
    "label": "Live / dead",
    "label_de": "Lebend / tot",
-   "prompt": "Click every nucleus. A nucleus with EthD-1 on it is dead; one without is live.",
-   "prompt_de": "Klicken Sie jeden Zellkern an. Ein Kern mit EthD-1 ist tot, ein Kern ohne EthD-1 ist lebend.",
-   "default_layer": "merged",
+   "prompt": "Find every nucleus on the greyscale Hoechst view, then switch to the dead view to judge each one. A nucleus with EthD-1 on it is dead; one without is live.",
+   "prompt_de": "Finden Sie jeden Zellkern in der Graustufenansicht (Hoechst) und wechseln Sie dann in die Ansicht \u201eNur tot\u201c, um jeden zu beurteilen. Ein Kern mit EthD-1 ist tot, ein Kern ohne EthD-1 ist lebend.",
+   "default_layer": "nuclei",
    "labels": [
     {
      "key": "live",
      "name": "Live",
      "name_de": "Lebend",
      "colour": "#4da6ff",
+     "shape": "circle",
      "hotkey": "1"
     },
     {
@@ -39,6 +41,7 @@
      "name": "Dead",
      "name_de": "Tot",
      "colour": "#ff4d6d",
+     "shape": "square",
      "hotkey": "2"
     },
     {
@@ -46,6 +49,7 @@
      "name": "Unsure",
      "name_de": "Unsicher",
      "colour": "#f5c518",
+     "shape": "triangle",
      "hotkey": "3"
     }
    ]
@@ -331,6 +335,7 @@
  "training": null,
  "prefill": null,
  "identity": "name",
+ "consent": null,
  "match_um": 8.0,
  "assignment": {
   "reference_passes": 1,

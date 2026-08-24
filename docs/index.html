@@ -144,6 +144,11 @@
   .pal button{display:flex;align-items:center;gap:9px;text-align:left;width:100%}
   .pal button.sel{border-color:var(--accent);background:var(--accent-soft)}
   .pal i{width:12px;height:12px;border-radius:50%;flex:none}
+  .pal-ic{width:20px;height:20px;flex:none}
+  .markerkey{display:flex;gap:20px;flex-wrap:wrap;margin:10px 0 4px;
+             background:var(--bg);border:1px solid var(--line);border-radius:10px;
+             padding:11px 14px}
+  .markerkey span{display:flex;align-items:center;gap:8px;font-size:14px}
   .pal .n{margin-left:auto;font-variant-numeric:tabular-nums;color:var(--dim);font-weight:600}
   .layers{display:flex;gap:6px}
   .layers button{flex:1;padding:8px 4px;font-size:12.5px}
@@ -355,6 +360,9 @@
       <div>
         <h3 data-i18n="learn.s2.h">Click once on every nucleus</h3>
         <p data-i18n="learn.s2.p"></p>
+        <div id="learnMarkers" class="markerkey"></div>
+        <p style="font-size:13.5px;color:var(--dim);margin:6px 0 0"
+           data-i18n="learn.s2.shapes"></p>
         <svg viewBox="0 0 460 150" width="460" role="img" aria-hidden="true">
           <defs><radialGradient id="nuc"><stop offset="0" stop-color="#9fd0ff"/>
             <stop offset="1" stop-color="#12345a" stop-opacity="0"/></radialGradient></defs>
@@ -597,6 +605,7 @@ en: {
   "learn.s2.h":"Click once on every nucleus",
   "learn.s2.p":"A dot appears where you click, so you cannot lose your place or count the same one twice. Judge only what you can actually see: if something is too faint for you to be sure it is a nucleus, leave it out rather than guessing. Being consistent matters more than being generous.",
   "learn.s2.faint":"too faint — leave it",
+  "learn.s2.shapes":"Each label has its own shape as well as its own colour, so you can tell them apart on a busy image and without relying on colour.",
   "learn.s3.h":"Only inside the dashed box",
   "learn.s3.p":"The dimmed border is context, so you can see nuclei that sit on the edge. A nucleus belongs to whichever square its CENTRE falls in. If the centre is outside your box, somebody else counts it — the app will not let you click there.",
   "learn.s3.yes":"centre inside — you count it","learn.s3.no":"centre outside — not yours",
@@ -730,6 +739,7 @@ de: {
   "learn.s2.h":"Jeden Zellkern einmal anklicken",
   "learn.s2.p":"An der angeklickten Stelle erscheint ein Punkt, damit Sie nicht die Übersicht verlieren oder denselben Kern doppelt zählen. Beurteilen Sie nur, was Sie tatsächlich erkennen können: Ist etwas zu schwach, um sicher ein Zellkern zu sein, lassen Sie es weg, statt zu raten. Gleichmäßigkeit ist wichtiger als Vollständigkeit.",
   "learn.s2.faint":"zu schwach — weglassen",
+  "learn.s2.shapes":"Jede Beschriftung hat eine eigene Form und eine eigene Farbe, damit sie sich auch in einem dichten Bild und ohne Farbunterscheidung auseinanderhalten lassen.",
   "learn.s3.h":"Nur innerhalb des gestrichelten Rahmens",
   "learn.s3.p":"Der abgedunkelte Rand dient nur der Orientierung, damit Sie Zellkerne am Rand erkennen können. Ein Zellkern gehört zu dem Quadrat, in dem sein MITTELPUNKT liegt. Liegt der Mittelpunkt außerhalb Ihres Rahmens, zählt ihn jemand anderes — die App lässt dort keine Markierung zu.",
   "learn.s3.yes":"Mittelpunkt innen — Sie zählen ihn","learn.s3.no":"Mittelpunkt außen — nicht Ihrer",
@@ -966,6 +976,32 @@ function colourOf(key){
   const l = labelsFor(S.mode).find(l => l.key === key);
   return l ? l.colour : "#fff";
 }
+function shapeOf(key){
+  const l = labelsFor(S.mode).find(l => l.key === key);
+  return (l && l.shape) || "circle";
+}
+
+/* A marker's meaning is carried by its SHAPE; colour only reinforces it. Hue
+   alone fails for a red/green-blind counter -- about one man in twelve -- and is
+   hard to read on a busy greyscale field for everyone else. */
+function markerSvg(shape, x, y, r, stroke, sw, faint){
+  const fill = faint ? 'fill-opacity="0.45"' : "";
+  const dash = faint ? `stroke-dasharray="${r*0.55} ${r*0.45}"` : "";
+  const core = `<circle cx="${x}" cy="${y}" r="${r*0.26}" fill="${stroke}" ${fill}/>`;
+  const common = `fill="none" stroke="${stroke}" stroke-width="${sw*1.6}" ${dash}`;
+  if (shape === "square") {
+    const h = r * 0.92;
+    return `<rect x="${x-h}" y="${y-h}" width="${h*2}" height="${h*2}"
+              ${common} stroke-linejoin="round"/>${core}`;
+  }
+  if (shape === "triangle") {
+    const p1 = `${x},${y - r*1.15}`, p2 = `${x - r},${y + r*0.72}`,
+          p3 = `${x + r},${y + r*0.72}`;
+    return `<polygon points="${p1} ${p2} ${p3}" ${common}
+              stroke-linejoin="round"/>${core}`;
+  }
+  return `<circle cx="${x}" cy="${y}" r="${r}" ${common}/>${core}`;
+}
 
 /* --------------------------------------------------------------- manifest */
 async function boot(){
@@ -1087,6 +1123,12 @@ function renderLearn(){
            <td style="color:var(--dim)">${t("ctl.keysD")}</td></tr>`;
   $("#learnControls").innerHTML = html;
 
+  const mode = currentMode() || Object.keys(M.modes)[0];
+  $("#learnMarkers").innerHTML = M.modes[mode].labels.map(l =>
+    `<span><svg class="pal-ic" viewBox="-10 -10 20 20" aria-hidden="true">` +
+    `${markerSvg(l.shape || "circle", 0, 0, 7.5, l.colour, 1.15, false)}</svg>` +
+    `${mt(l,"name")} <kbd>${l.hotkey}</kbd></span>`).join("");
+
   $("[data-i18n='learn.s5.p']").textContent = hasTrain ? t("learn.s5.p") : t("learn.s5.noTrain");
   $("#btnLearnGo").textContent = hasTrain ? t("learn.go") : t("learn.goNoTrain");
 }
@@ -1186,8 +1228,10 @@ function buildPalette(){
   labelsFor(S.mode).forEach(l => {
     const b = document.createElement("button");
     b.dataset.key = l.key;
-    b.innerHTML = `<i style="background:${l.colour}"></i>${mt(l,"name")}
-                   <span class="n" data-n="${l.key}">0</span>`;
+    const sh = l.shape || "circle";
+    b.innerHTML = `<svg class="pal-ic" viewBox="-10 -10 20 20" aria-hidden="true">
+                     ${markerSvg(sh, 0, 0, 7.5, l.colour, 1.15, false)}</svg>` +
+                  `${mt(l,"name")}<span class="n" data-n="${l.key}">0</span>`;
     b.onclick = () => setLabel(l.key);
     p.appendChild(b);
   });
@@ -1314,13 +1358,10 @@ function draw(){
   }
 
   st.marks.forEach((m, i) => {
-    const dash = m.proposed ? `stroke-dasharray="${r*0.55} ${r*0.45}"` : "";
     h += `<g class="mk" data-i="${i}" style="cursor:pointer">
             <circle cx="${m.x}" cy="${m.y}" r="${r*2.2}" fill="transparent"/>
-            <circle cx="${m.x}" cy="${m.y}" r="${r}" fill="none"
-                    stroke="${colourOf(m.label)}" stroke-width="${sw*1.6}" ${dash}/>
-            <circle cx="${m.x}" cy="${m.y}" r="${r*0.28}" fill="${colourOf(m.label)}"
-                    ${m.proposed ? 'fill-opacity="0.45"' : ""}/>
+            ${markerSvg(shapeOf(m.label), m.x, m.y, r, colourOf(m.label), sw,
+                        !!m.proposed)}
           </g>`;
   });
   sv.innerHTML = h;

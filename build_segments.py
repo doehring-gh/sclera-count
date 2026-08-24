@@ -135,10 +135,16 @@ LAYERS_BY_SCHEME = {
     ],
 }
 
+# Shape carries the meaning; colour only reinforces it. A marker distinguished by
+# hue alone fails for a red/green-blind counter and is hard to tell apart on a
+# busy greyscale field for everyone else.
 _LD = [
-    {"key": "live", "name": "Live", "name_de": "Lebend", "colour": "#4da6ff", "hotkey": "1"},
-    {"key": "dead", "name": "Dead", "name_de": "Tot", "colour": "#ff4d6d", "hotkey": "2"},
-    {"key": "unsure", "name": "Unsure", "name_de": "Unsicher", "colour": "#f5c518", "hotkey": "3"},
+    {"key": "live", "name": "Live", "name_de": "Lebend", "colour": "#4da6ff",
+     "shape": "circle", "hotkey": "1"},
+    {"key": "dead", "name": "Dead", "name_de": "Tot", "colour": "#ff4d6d",
+     "shape": "square", "hotkey": "2"},
+    {"key": "unsure", "name": "Unsure", "name_de": "Unsicher", "colour": "#f5c518",
+     "shape": "triangle", "hotkey": "3"},
 ]
 
 MODES_BY_SCHEME = {
@@ -150,15 +156,22 @@ MODES_BY_SCHEME = {
                          "Ohne Beurteilung von lebend oder tot.",
             "default_layer": "nuclei",
             "labels": [{"key": "cell", "name": "Nucleus", "name_de": "Zellkern",
-                        "colour": "#f5c518", "hotkey": "1"}],
+                        "colour": "#f5c518", "shape": "circle", "hotkey": "1"}],
         },
         "livedead": {
             "label": "Live / dead", "label_de": "Lebend / tot",
-            "prompt": "Click every nucleus. A nucleus with EthD-1 on it is dead; "
-                      "one without is live.",
-            "prompt_de": "Klicken Sie jeden Zellkern an. Ein Kern mit EthD-1 ist tot, "
-                         "ein Kern ohne EthD-1 ist lebend.",
-            "default_layer": "merged", "labels": _LD,
+            "prompt": "Find every nucleus on the greyscale Hoechst view, then switch "
+                      "to the dead view to judge each one. A nucleus with EthD-1 on "
+                      "it is dead; one without is live.",
+            "prompt_de": "Finden Sie jeden Zellkern in der Graustufenansicht "
+                         "(Hoechst) und wechseln Sie dann in die Ansicht „Nur tot“, "
+                         "um jeden zu beurteilen. Ein Kern mit EthD-1 ist tot, ein "
+                         "Kern ohne EthD-1 ist lebend.",
+            # Counting happens on a single greyscale channel. Colour-coded overlays
+            # are a poor basis for accurate counting, and around one man in twelve
+            # cannot use a red/green pair reliably at all (Torsten Bossing, 2026-08-24).
+            # The merged view stays available for orientation.
+            "default_layer": "nuclei", "labels": _LD,
         },
     },
     "calcein": {
@@ -169,7 +182,7 @@ MODES_BY_SCHEME = {
                          "ohne sie einzuordnen.",
             "default_layer": "merged",
             "labels": [{"key": "cell", "name": "Cell", "name_de": "Zelle",
-                        "colour": "#f5c518", "hotkey": "1"}],
+                        "colour": "#f5c518", "shape": "circle", "hotkey": "1"}],
         },
         "livedead": {
             "label": "Live / dead", "label_de": "Lebend / tot",
