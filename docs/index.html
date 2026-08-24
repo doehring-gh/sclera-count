@@ -68,6 +68,17 @@
   .legend{display:flex;gap:18px;flex-wrap:wrap;margin-top:12px}
   .legend i{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:7px;
             vertical-align:middle}
+  .codebox{display:flex;gap:12px;align-items:center;flex-wrap:wrap;
+           background:var(--accent-soft);border:1px solid var(--accent);
+           border-radius:10px;padding:16px 18px}
+  .codebox code{font:600 25px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace;
+                letter-spacing:.02em;color:var(--ink);user-select:all}
+  .confirmrow{display:flex;gap:10px;align-items:flex-start;margin-top:14px;cursor:pointer}
+  .confirmrow input{min-height:auto;width:18px;height:18px;margin-top:2px;flex:none;
+                    accent-color:var(--accent)}
+  .codeagain{background:var(--accent-soft);border:1px solid var(--accent);
+             border-radius:10px;padding:14px 16px;margin-bottom:16px}
+  .codeagain code{font:600 21px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace;user-select:all}
 
   /* ---------------- explainer ---------------- */
   .step{display:flex;gap:16px;align-items:flex-start;margin-bottom:22px}
@@ -230,17 +241,38 @@
   </div>
 
   <div class="card">
-    <h2 data-i18n="who.head">Who is counting</h2>
-    <div class="row">
-      <div class="field">
-        <label for="rater" data-i18n="who.name">Your name</label>
-        <input id="rater" autocomplete="off">
-      </div>
-      <div class="field">
-        <label for="block" data-i18n="who.set">Your set</label>
-        <select id="block"></select>
+    <h2 id="whoHead" data-i18n="who.head">Who is counting</h2>
+
+    <div id="nameMode">
+      <div class="row">
+        <div class="field">
+          <label for="rater" data-i18n="who.name">Your name</label>
+          <input id="rater" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="block" data-i18n="who.set">Your set</label>
+          <select id="block"></select>
+        </div>
       </div>
     </div>
+
+    <div id="codeMode" class="hide">
+      <p style="margin:0 0 12px" data-i18n="code.intro"></p>
+      <div class="codebox">
+        <code id="codeText">–</code>
+        <button id="btnNewCode" type="button" data-i18n="code.another">Give me another</button>
+      </div>
+      <label class="confirmrow">
+        <input type="checkbox" id="codeSaved">
+        <span data-i18n="code.written">I have written this down somewhere I will still have it</span>
+      </label>
+      <p class="sub" style="margin:12px 0 0;font-size:13px" data-i18n="code.why"></p>
+      <div class="field" style="margin-top:14px;max-width:260px">
+        <label for="blockCode" data-i18n="who.set">Your set</label>
+        <select id="blockCode"></select>
+      </div>
+    </div>
+
     <p class="sub" style="margin:14px 0 0;font-size:13px" data-i18n="who.note"></p>
   </div>
 
@@ -443,6 +475,7 @@
 <!-- ============================ DONE ============================= -->
 <section id="done" class="page hide">
   <h1 data-i18n="done.title">Thank you</h1>
+  <div id="doneCode" class="codeagain hide"></div>
   <div id="doneWarn"></div>
   <p id="doneMsg"></p>
   <div class="card">
@@ -478,6 +511,13 @@ en: {
   "who.namePlaceholder":"e.g. Maryam Ali",
   "who.note":"Use the set you were sent. Everyone counts a few shared squares plus a set of their own, which is how we work out where counters agree and where they do not.",
   "who.squares":"{n} squares",
+  "who.headCode":"Your anonymous code",
+  "code.intro":"You do not give your name. This is your code for the study — it is the only thing that connects your answers to each other.",
+  "code.another":"Give me a different one",
+  "code.written":"I have written this down somewhere I will still have it",
+  "code.why":"Nobody, including the researchers, can work out who you are from this code. That also means it is the only way to withdraw your data later: if you want it removed, quote this code. Without it we cannot find your answers to delete them.",
+  "code.needSaved":"tick the box once you have written the code down",
+  "done.yourCode":"Your code was <code>{code}</code> — keep it if you might want to withdraw your data.",
   "task.head":"What to count",
   "setup.start":"Continue","setup.needName":"type your name to begin",
 
@@ -580,6 +620,13 @@ de: {
   "who.namePlaceholder":"z. B. Maryam Ali",
   "who.note":"Bitte den Satz verwenden, der Ihnen zugeschickt wurde. Alle zählen einige gemeinsame Quadrate und zusätzlich einen eigenen Satz. So lässt sich feststellen, wo die Zählungen übereinstimmen und wo nicht.",
   "who.squares":"{n} Quadrate",
+  "who.headCode":"Ihr anonymer Code",
+  "code.intro":"Sie geben Ihren Namen nicht an. Dies ist Ihr Code für die Studie — nur er verbindet Ihre Antworten miteinander.",
+  "code.another":"Anderen Code anzeigen",
+  "code.written":"Ich habe den Code notiert und werde ihn wiederfinden",
+  "code.why":"Niemand, auch nicht das Forschungsteam, kann aus diesem Code auf Sie schließen. Das heißt aber auch: Nur über diesen Code können Sie Ihre Daten später zurückziehen. Ohne ihn können wir Ihre Antworten nicht finden und löschen.",
+  "code.needSaved":"Bitte ankreuzen, sobald Sie den Code notiert haben",
+  "done.yourCode":"Ihr Code war <code>{code}</code> — bewahren Sie ihn auf, falls Sie Ihre Daten zurückziehen möchten.",
   "task.head":"Was gezählt wird",
   "setup.start":"Weiter","setup.needName":"Bitte zuerst den Namen eingeben",
 
@@ -718,6 +765,39 @@ let segEnteredAt = 0;
 let reviewed = new Set();
 let IMGS = {};
 let ACCESS_KEY = "";      // from ?key= in the emailed link; authorises the write
+
+/* ---------------------------------------------------------- anonymous codes
+   Participants identify themselves with a code the app generates, not a name
+   and not a pseudonym they invent.
+
+   Self-chosen pseudonyms collide (several people reach for the same obvious
+   word, and their data silently merges) and are often quietly identifying — a
+   pet's name or initials-and-year is exactly the kind of thing a small
+   department can place. Generating it removes both problems and costs the
+   participant nothing extra: either way they have to write it down.
+
+   Two words plus two digits from these lists is ~922,000 combinations, so with
+   twenty participants the chance of any collision is roughly 0.02%.            */
+const CODE_A = ("amber azure bright calm clever coral crisp dusty eager fair firm gentle glad " +
+  "golden green happy hidden ivory jade keen kind lively lucky mellow merry mild misty noble " +
+  "olive open patient plain proud quiet rapid ready rosy royal ruby sage sandy sharp silver " +
+  "simple sleek slate solid spry steady stone sunny swift teal tidy true velvet vivid warm " +
+  "willing wise witty woven young zesty brave bronze cedar clear cobalt copper dawn deft dusk " +
+  "ember fleet frost grand hazel humble indigo linen").split(" ");
+const CODE_B = ("acorn anchor arrow badger beacon birch bison bramble breeze brook cedar cliff " +
+  "clover comet coral crane creek dune eagle elder falcon fern finch forest fox garnet grove " +
+  "harbor hawk heather heron hollow ibis island juniper kestrel lantern larch laurel lily lynx " +
+  "maple marsh meadow mesa moss otter owl pebble pine plover quarry quill raven reef ridge " +
+  "river robin sable sage shore sparrow spruce stone summit swan thistle thrush tide topaz " +
+  "vale valley willow wren").split(" ");
+
+function makeCode(){
+  const r = new Uint32Array(3);
+  (window.crypto || window.msCrypto).getRandomValues(r);
+  return `${CODE_A[r[0] % CODE_A.length]}-${CODE_B[r[1] % CODE_B.length]}-` +
+         String(10 + (r[2] % 90));
+}
+function identityMode(){ return (M && M.identity) === "code" ? "code" : "name"; }
 const LS_KEY = "sclera-count-session-v1";
 
 const nowISO = () => new Date().toISOString();
@@ -745,12 +825,14 @@ async function boot(){
   }
   $("#studyName").textContent = M.study;
   renderSetup();
-  if (q.get("block") && M.blocks[q.get("block")]) $("#block").value = q.get("block");
+  if (q.get("block") && M.blocks[q.get("block")]) {
+    $("#block").value = q.get("block"); $("#blockCode").value = q.get("block");
+  }
   if (q.get("mode") && M.modes[q.get("mode")]) {
     const r = document.querySelector(`input[name=mode][value="${q.get("mode")}"]`);
     if (r) r.checked = true;
   }
-  if (q.get("rater")) $("#rater").value = q.get("rater");
+  if (q.get("rater") && identityMode() === "name") $("#rater").value = q.get("rater");
   // Access key travels in the emailed link only -- never in manifest.json, which
   // is served publicly. Kept out of the URL bar after boot so it is less likely
   // to be copied around by accident.
@@ -763,21 +845,35 @@ async function boot(){
 
   setSync(M.endpoint ? t("sync.notsent") : t("sync.export"), "");
   $("#rater").addEventListener("input", checkStart);
+  $("#codeSaved").addEventListener("change", checkStart);
+  $("#btnNewCode").addEventListener("click", () => {
+    $("#codeText").textContent = makeCode();
+    $("#codeSaved").checked = false;      // a new code has not been written down
+    checkStart();
+  });
   applyLang();
   checkStart();
   offerResume();
 }
 
 function renderSetup(){
-  const bsel = $("#block"), keep = bsel.value;
-  bsel.innerHTML = "";
-  Object.keys(M.blocks).forEach(b => {
-    const o = document.createElement("option");
-    o.value = b;
-    o.textContent = `${b} — ${t("who.squares", {n:M.blocks[b].length})}`;
-    bsel.appendChild(o);
+  const code = identityMode() === "code";
+  $("#nameMode").classList.toggle("hide", code);
+  $("#codeMode").classList.toggle("hide", !code);
+  $("#whoHead").textContent = code ? t("who.headCode") : t("who.head");
+  if (code && $("#codeText").textContent.length < 4) $("#codeText").textContent = makeCode();
+
+  [$("#block"), $("#blockCode")].forEach(bsel => {
+    const keep = bsel.value;
+    bsel.innerHTML = "";
+    Object.keys(M.blocks).forEach(b => {
+      const o = document.createElement("option");
+      o.value = b;
+      o.textContent = `${b} — ${t("who.squares", {n:M.blocks[b].length})}`;
+      bsel.appendChild(o);
+    });
+    if (keep) bsel.value = keep;
   });
-  if (keep) bsel.value = keep;
 
   const mc = $("#modeChoice"), chosen = currentMode();
   mc.innerHTML = "";
@@ -794,9 +890,22 @@ function currentMode(){
   return r ? r.value : null;
 }
 function checkStart(){
+  if (identityMode() === "code") {
+    const ok = $("#codeSaved").checked && $("#codeText").textContent.length > 3;
+    $("#btnStart").disabled = !ok;
+    $("#startHint").textContent = ok ? "" : t("code.needSaved");
+    return;
+  }
   const ok = $("#rater").value.trim().length >= 2;
   $("#btnStart").disabled = !ok;
   $("#startHint").textContent = ok ? "" : t("setup.needName");
+}
+function raterId(){
+  return identityMode() === "code" ? $("#codeText").textContent.trim()
+                                   : $("#rater").value.trim();
+}
+function chosenBlock(){
+  return identityMode() === "code" ? $("#blockCode").value : $("#block").value;
 }
 
 /* --------------------------------------------------------------- explainer */
@@ -824,11 +933,11 @@ function renderLearn(){
 
 /* ---------------------------------------------------------------- session */
 function newSession(){
-  const block = $("#block").value, mode = currentMode();
+  const block = chosenBlock(), mode = currentMode();
   const train = (M.training && M.training.segments) ? [...M.training.segments] : [];
   S = {
     schema:"sclera-count-v1", app_version:APP_VERSION, lang:LANG,
-    study:M.study, rater:$("#rater").value.trim(), block, mode,
+    study:M.study, rater:raterId(), block, mode,
     started_utc:nowISO(), finished_utc:null, submitted_utc:null,
     key:ACCESS_KEY,
     n_training:train.length,
@@ -1536,6 +1645,12 @@ async function finish(){
   $("#count").classList.remove("on");
   $("#done").classList.remove("hide");
   $("#lang").style.display = "";
+
+  const dc = $("#doneCode");
+  if (identityMode() === "code") {
+    dc.innerHTML = t("done.yourCode", {code: S.rater});
+    dc.classList.remove("hide");
+  } else { dc.classList.add("hide"); }
 
   $("#doneWarn").innerHTML = done < total
     ? `<div class="warnbox">${t("done.partial", {done, total})}</div>` : "";

@@ -770,6 +770,11 @@ def main():
     p.add_argument("--scheme", default="hoechst", choices=sorted(SCHEMES),
                    help="hoechst = Hoechst 33342 + EthD-1 (all nuclei plus dead, the "
                         "scheme this task needs); calcein = calcein + EthD-1 (no total)")
+    p.add_argument("--identity", default="name", choices=["name", "code"],
+                   help="how counters identify themselves. 'name' for the expert "
+                        "panel; 'code' for participants — the app generates an "
+                        "anonymous code they keep, so no name is ever collected and "
+                        "no name-to-code key exists for anyone to hold")
     p.add_argument("--endpoint", default="",
                    help="Google Apps Script /exec URL for auto-submit (optional)")
     p.add_argument("--field-width-um", type=float, default=FIELD_WIDTH_UM)
@@ -952,7 +957,7 @@ def main():
             "layers": LAYERS_BY_SCHEME[args.scheme],
             "fields": fields_meta, "segments": all_segments,
             "anchors": [], "blocks": manifest_blocks, "training": None,
-            "prefill": prefill,
+            "prefill": prefill, "identity": args.identity,
             "match_um": args.match_um,
             "assignment": {"reference_passes": args.reference_passes,
                            "seed": args.seed},
@@ -988,6 +993,7 @@ def main():
         "blocks": blocks,
         "training": training,
         "prefill": prefill,
+        "identity": args.identity,
         "match_um": args.match_um,
         "assignment": {
             "n_blocks": args.blocks, "replicates": args.replicates,

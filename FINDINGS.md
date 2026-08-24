@@ -281,6 +281,38 @@ empty to accept anything, which keeps already-sent links working.
 
 Undeploy the web app once collection is finished.
 
+### Participant anonymity (`--identity code`)
+
+Experts are named; **participants are not**. The app generates a code —
+`amber-larch-63` — which the participant writes down and which becomes the only
+thing linking their answers together. No name is collected and **no name-to-code
+key exists for anyone to hold**, so the participant data is anonymous rather than
+pseudonymous. That matters legally as well as ethically: pseudonymised data with a
+key the researcher holds is still personal data under UK GDPR; genuinely anonymous
+data is outside it.
+
+The code is generated rather than chosen by the participant, which was the
+original proposal. Self-chosen pseudonyms have two failure modes: several people
+reach for the same obvious word and their data silently merges, and people tend to
+pick something quietly identifying — a pet's name, initials and a year — which a
+small department can place. Generating it removes both and costs the participant
+nothing, since either way they must write it down.
+
+Two words plus two digits from the embedded lists is ~922,000 combinations, so
+with twenty participants the chance of any collision is about 0.02%. The app will
+not start until they tick that they have recorded it, choosing a new code clears
+that tick, and the code is shown again on the finish screen.
+
+**Residual re-identification risk.** Even anonymous, the app records seconds per
+square, brightness and contrast settings, language, and timestamps. In a pool of
+twenty colleagues from one department, someone who counted at 03:00 in German is
+potentially identifiable. Do not publish per-rater metadata at that granularity,
+and coarsen timestamps before sharing.
+
+**Consequence to state in the information sheet:** withdrawal is only possible
+while the data still exists separately and only by quoting the code. Once results
+are aggregated or published, the data cannot be found and removed.
+
 Two test rows were written during setup and should be deleted from the Sheet:
 `__TEST__` and `CONNECTIVITY_CHECK`.
 
