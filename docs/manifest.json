@@ -1,6 +1,6 @@
 {
  "schema": "sclera-count-manifest-v1",
- "study": "SCLERA cell count \u2014 reference pass",
+ "study": "SCLERA cell count \u2014 TRIAL (feedback only, not used as data) \u2014 reference pass",
  "built_by": "build_segments.py --reference-passes",
  "endpoint": "",
  "modes": {
@@ -139,7 +139,7 @@
      }
     }
    },
-   "n_squares": 3
+   "n_squares": 2
   },
   {
    "field": 2,
@@ -202,7 +202,7 @@
      }
     }
    },
-   "n_squares": 3
+   "n_squares": 2
   }
  ],
  "segments": [
@@ -263,34 +263,6 @@
    }
   },
   {
-   "id": "f1_G5",
-   "field": 1,
-   "square": "G5",
-   "col": "G",
-   "row": "5",
-   "z": 5,
-   "depth_um": 26.3,
-   "location": "006/1/Image 5/G5",
-   "tile_w": 80,
-   "tile_h": 80,
-   "count_box": [
-    8,
-    8,
-    72,
-    72
-   ],
-   "tile_origin": [
-    376,
-    248
-   ],
-   "upscale": 1,
-   "layers": {
-    "dead": "tiles/f1_G5_dead.png",
-    "nuclei": "tiles/f1_G5_nuclei.png",
-    "merged": "tiles/f1_G5_merged.png"
-   }
-  },
-  {
    "id": "f2_C3",
    "field": 2,
    "square": "C3",
@@ -345,64 +317,22 @@
     "nuclei": "tiles/f2_F3_nuclei.png",
     "merged": "tiles/f2_F3_merged.png"
    }
-  },
-  {
-   "id": "f2_G5",
-   "field": 2,
-   "square": "G5",
-   "col": "G",
-   "row": "5",
-   "z": 9,
-   "depth_um": 47.4,
-   "location": "006/1/Image 5/G5",
-   "tile_w": 80,
-   "tile_h": 80,
-   "count_box": [
-    8,
-    8,
-    72,
-    72
-   ],
-   "tile_origin": [
-    376,
-    248
-   ],
-   "upscale": 1,
-   "layers": {
-    "dead": "tiles/f2_G5_dead.png",
-    "nuclei": "tiles/f2_G5_nuclei.png",
-    "merged": "tiles/f2_G5_merged.png"
-   }
   }
  ],
  "anchors": [],
  "blocks": {
   "REF": [
-   "f2_F3",
-   "f1_C3",
-   "f2_G5",
-   "f1_F3",
-   "f2_C3",
-   "f1_G5",
-   "f2_C3",
-   "f1_F3",
-   "f2_G5",
-   "f2_F3",
-   "f1_C3",
-   "f1_G5",
-   "f2_F3",
-   "f1_G5",
-   "f2_C3",
    "f1_C3",
    "f1_F3",
-   "f2_G5"
+   "f2_F3",
+   "f2_C3"
   ]
  },
  "training": null,
  "prefill": null,
  "match_um": 8.0,
  "assignment": {
-  "reference_passes": 3,
+  "reference_passes": 1,
   "seed": 20260823
  },
  "tiling": {

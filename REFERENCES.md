@@ -142,6 +142,91 @@ images in a way that preserves their quantitative nature.
 
 ---
 
+## Stains, penetration and the specimen
+
+Added 2026-08-24 when the staining question opened. These decided the
+Hoechst-versus-DAPI-versus-DRAQ5 question in [FINDINGS.md](FINDINGS.md) §2.
+
+**Chazotte B (2008). Labeling the nucleus with fluorescent dyes for imaging.**
+*CSH Protocols.*
+> "One advantage of Hoechst 33342 over DAPI is that the former is
+> membrane-permeant and is, therefore, useful for imaging living cells."
+>
+> Used for: rejecting DAPI. In live tissue an impermeant dye labels compromised
+> cells preferentially and destroys the all-nuclei denominator.
+
+**Hirai Y et al. (2023). Boron Clusters Alter the Membrane Permeability of
+Dicationic Fluorescent DNA-Staining Dyes.** *ACS Omega.*
+> Confirms DAPI and PI are membrane-impermeable — carriers are needed to get them
+> into live cells at all.
+
+**Zhao H, Traganos F, Dobrucki J, Wlodkowic D, Darzynkiewicz Z (2009). Induction
+of DNA damage response by the supravital probes of nucleic acids.**
+*Cytometry A* 75(6):510–19.
+[10.1002/cyto.a.20727](https://doi.org/10.1002/cyto.a.20727) · PMID 19373929
+> Hoechst 33342, DRAQ5 and DyeCycle Violet all induce DNA damage response to
+> varying degrees. **SYTO 17 had no significant effect on any measured parameter.**
+>
+> Used for: rejecting DRAQ5, and identifying SYTO 17 as the far-red candidate
+> worth testing if depth becomes the binding constraint.
+
+**Richard E et al. (2010). Short exposure to the DNA intercalator DRAQ5
+dislocates the transcription machinery and induces cell death.**
+*Photochem Photobiol* 87(1):256–61.
+[10.1111/j.1751-1097.2010.00852.x](https://doi.org/10.1111/j.1751-1097.2010.00852.x)
+· PMID 21175643
+> 30 min DRAQ5 killed U2OS cells 24 h later; **Hoechst 33342 under the same
+> conditions did not.** The decisive result: a dye that kills cells cannot be used
+> to measure whether cells are alive.
+
+**Mari P-O et al. (2010). Influence of the live cell DNA marker DRAQ5 on
+chromatin-associated processes.** *DNA Repair* 9(7):848–55.
+[10.1016/j.dnarep.2010.04.001](https://doi.org/10.1016/j.dnarep.2010.04.001)
+· PMID 20439168
+> DRAQ5 inhibits cellular functions; "great caution" advised.
+
+**Muerner M, Ma J, Kubincova B, Sprecher CM, Stoddart MJ, Grad S (2026).
+Optimization and comparison of different methods for assessing cell viability in
+intervertebral disc organ cultures.** *Front Bioeng Biotechnol* 14:1796998.
+[10.3389/fbioe.2026.1796998](https://doi.org/10.3389/fbioe.2026.1796998)
+· PMID 42137623
+> Calcein AM/EthD-1 in dense tissue **required Collagenase P pre-treatment** for
+> adequate penetration, and immediate processing after harvest. Explicitly notes
+> the findings apply to other dense tissues.
+>
+> Used for: the penetration hypothesis for our un-sectioned scleral buttons.
+
+**Stoddart MJ, Furlong PI, Simpson A, Davies CM, Richards RG (2006). A comparison
+of non-radioactive methods for assessing viability in ex vivo cultured cancellous
+bone.** *Eur Cell Mater* 12:16–25.
+[10.22203/ecm.v012a02](https://doi.org/10.22203/ecm.v012a02) · PMID 16888702
+> Penetration into whole explants "easily led to artefacts that could be overcome
+> by preparing 250 µm unfixed sections". Separately, tissue autofluorescence gave
+> a high signal-to-noise ratio "making assessment of osteocyte viability
+> impossible".
+>
+> Used for: the section-or-not question, and a second reason to avoid a green
+> channel in collagen-rich tissue.
+
+**Svare F, Åkerström B, Ghosh F (2021). It's About Time: Time-Dependent Tissue
+Damage in the Adult Porcine Retina After Enucleation.**
+*Cells Tissues Organs* 210(1):58–65.
+[10.1159/000514795](https://doi.org/10.1159/000514795) · PMID 34038912
+> Porcine retina at **240 min** post-enucleation showed significantly more tissue
+> damage, more apoptosis and reduced ganglion cell survival than at 90 min.
+>
+> Used with a caveat: our specimens are ~4 h post-mortem, matching that mark, but
+> retina is far more metabolically demanding than sclera. Flagged as a question
+> for the panel, **not** read across as evidence about sclera.
+
+**Jun YW et al. (2017). Addressing the autofluorescence issue in deep tissue
+imaging by two-photon microscopy: the significance of far-red emitting dyes.**
+*Chemical Science.*
+> Minimal autofluorescence from the red channel regardless of tissue type;
+> far-red dyes image deepest.
+
+---
+
 ## What is *not* covered by any of these
 
 No paper found here measures **how manual countability changes with confocal
