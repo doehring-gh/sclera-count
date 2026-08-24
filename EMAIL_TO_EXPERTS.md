@@ -89,21 +89,72 @@ lose your place; click a dot again to remove it.
 If a square genuinely has nothing in it, press **Nothing here**. That is a real
 answer and I need it recorded as one.
 
-**Two questions I would value your answer to**
+**The specimens, so you know what you are advising on**
 
-1. **The staining.** These images are Hoechst 33342 for all nuclei plus ethidium
-   homodimer-1 for dead cells. That combination is not yet finally settled, and I
-   would rather settle it before running the full study than after. The aim is
-   automated live/dead counting that gives viability through the tissue — per
-   z-slice, not just one number per field — so what I need is a stain pair where
-   the "all nuclei" channel stays detectable as deep as the "dead" channel does.
-   If you would use something different for dense collagenous tissue at depth,
-   please say. Nothing is committed yet.
+Full-thickness scleral buttons punched from the posterior pole of fresh porcine
+eyes with a stamp cutter (fixed width and length), roughly 4 hours post-mortem.
+Not sectioned in depth — the tissue is intact from the surface down, so the dyes
+reach the cells only by diffusing in from the top. Currently Hoechst 33342 for
+all nuclei and ethidium homodimer-1 for dead cells, imaged as confocal z-stacks
+at 5.26 µm per slice.
 
-2. **The tool itself.** Was it clear what you were being asked to do? Anything
-   confusing, tedious, or missing? It is about to be given to roughly twenty
-   people who are not experts, so awkwardness now is much cheaper than awkwardness
-   then. Blunt feedback is more useful than kind feedback.
+**Four things I would genuinely value your view on**
+
+I have been through the images and the literature and formed some opinions. I
+would rather have them corrected now than defended later, so please push back.
+
+**1. The staining.** My current thinking is to *keep* Hoechst + EthD-1 rather
+than change it. I had considered moving to DAPI, but DAPI is membrane-impermeant
+— that is precisely why Hoechst 33342 is the live-cell one — so in living tissue
+it would behave as a second dead-cell marker and I would lose the "all nuclei"
+denominator that makes counting a total meaningful. DRAQ5, the obvious far-red
+alternative for depth, looks worse for a viability assay specifically: short
+exposures have been reported to induce DNA damage responses and cell death where
+Hoechst under the same conditions did not. Using a dye that kills cells to
+measure whether cells are alive seems like a bad trade.
+
+Where I am much less sure: whether there is a better far-red option that keeps a
+true all-nuclei denominator, given how much depth we are losing. If you have used
+something in dense collagenous tissue that works at depth, I would like to hear it.
+
+**2. Depth — and a problem I think is bigger than the dye.** Signal dies fast.
+Measured across our stacks, the nuclear channel is essentially gone somewhere
+between 26 and 47 µm, and only one stack reaches 68 µm. In a sclera several
+hundred microns thick, we are sampling a thin superficial layer — and it is the
+layer most exposed to handling and to the longest dye contact.
+
+Two things follow, and I would like your opinion on both:
+
+- Because the tissue is not sectioned, I suspect diffusion is as much the limit
+  as optics. Work on other dense tissues points the same way: intervertebral disc
+  organ culture needed collagenase pre-treatment before Calcein AM/EthD-1
+  penetrated adequately, and in cancellous bone the penetration artefacts were
+  only solved by cutting thick unfixed sections. Would you section these, and if
+  so how, accepting that cutting creates its own dead layer to exclude?
+
+- More worrying: apparent viability may fall with depth for a purely technical
+  reason. A dead nucleus carries signal in two channels and is brighter than a
+  live one, so as sensitivity drops with depth the dead cells stay detectable
+  after the live ones have disappeared. In one of our stacks the apparent dead
+  fraction climbs 72% → 90% → 100% as the detected count collapses from 391 to
+  17. I do not think that is the tissue dying; I think it is the assay running out
+  of sensitivity. If we report viability per z-slice without controlling for it,
+  we will publish an artefact. I would welcome any view on how to bound this
+  properly.
+
+**3. A question about the specimens themselves.** Our dead fractions look high to
+me. There is work showing porcine retina at 240 minutes post-enucleation has
+significantly more damage and apoptosis than at 90 minutes — different tissue, and
+sclera is far less metabolically demanding, so I would not read it across
+directly. But our 4-hour window sits exactly at that mark. Is that a timescale
+you would worry about for scleral fibroblasts, or is sclera forgiving enough that
+it does not matter?
+
+**4. The tool itself.** Was it clear what you were being asked to do? Anything
+confusing, tedious, or missing? Did the brightness control do what you needed on
+the dimmer squares? It is about to go to roughly twenty non-experts, so
+awkwardness now is far cheaper than awkwardness then — blunt feedback is more
+useful than kind feedback.
 
 **When you are done**
 
