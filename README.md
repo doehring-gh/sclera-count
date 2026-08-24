@@ -533,6 +533,11 @@ Works on a laptop or an iPad. Nothing to install.
 
 ### Collecting the counts automatically
 
+**GitHub Pages cannot receive data — it only serves files.** Saving answers
+straight into the repository would mean putting a write-scoped GitHub token into
+a public page, where anyone could take it and write to the repo. Don't. Use the
+Sheet below, which the counters never see and you own.
+
 1. Make a Google Sheet.
 2. **Extensions → Apps Script**, paste `apps_script/Code.gs`.
 3. **Deploy → New deployment → Web app**, **Execute as: Me**, **Who has access:

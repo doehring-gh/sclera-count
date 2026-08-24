@@ -223,6 +223,7 @@ Recorded because the corrections are part of the method.
 | Cited Jonkman poster DOI as the tutorial | Verified against PubMed before writing | Correct DOI recorded |
 | Guessed a PMID for Stoddart 2006 | Returned an unrelated hypothyroidism paper | Searched properly |
 | "1.0× more disagreement" line compared spread when the signal was bias | Output read as nonsense | Rewritten to compare relative bias |
+| Reference/trial builds hard-coded `"endpoint": ""` so they could never auto-save | Testing the submit path against a mock endpoint | Uses `args.endpoint`; verified end to end |
 
 ---
 

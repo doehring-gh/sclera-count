@@ -948,7 +948,7 @@ def main():
             "schema": "sclera-count-manifest-v1",
             "study": args.study + " — reference pass",
             "built_by": "build_segments.py --reference-passes",
-            "endpoint": "", "modes": MODES_BY_SCHEME[args.scheme],
+            "endpoint": args.endpoint, "modes": MODES_BY_SCHEME[args.scheme],
             "layers": LAYERS_BY_SCHEME[args.scheme],
             "fields": fields_meta, "segments": all_segments,
             "anchors": [], "blocks": manifest_blocks, "training": None,
