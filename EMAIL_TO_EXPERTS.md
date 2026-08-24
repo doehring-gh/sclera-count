@@ -89,6 +89,22 @@ lose your place; click a dot again to remove it.
 If a square genuinely has nothing in it, press **Nothing here**. That is a real
 answer and I need it recorded as one.
 
+**Two questions I would value your answer to**
+
+1. **The staining.** These images are Hoechst 33342 for all nuclei plus ethidium
+   homodimer-1 for dead cells. That combination is not yet finally settled, and I
+   would rather settle it before running the full study than after. The aim is
+   automated live/dead counting that gives viability through the tissue — per
+   z-slice, not just one number per field — so what I need is a stain pair where
+   the "all nuclei" channel stays detectable as deep as the "dead" channel does.
+   If you would use something different for dense collagenous tissue at depth,
+   please say. Nothing is committed yet.
+
+2. **The tool itself.** Was it clear what you were being asked to do? Anything
+   confusing, tedious, or missing? It is about to be given to roughly twenty
+   people who are not experts, so awkwardness now is much cheaper than awkwardness
+   then. Blunt feedback is more useful than kind feedback.
+
 **When you are done**
 
 Press **Download my counts**. You will get three files. Please send me all three,
@@ -109,6 +125,12 @@ Given how far apart the first two counters turned out to be, I would rather
 over-sample the expert opinion than under-sample it. **If you know someone else
 with the right expertise who might be willing, tell me and I will send them a
 link** — more independent experts makes the reference stronger, not weaker.
+
+One caveat in fairness: if the staining does change, the images change with it,
+and I may have to ask you to repeat this on the new ones. I would rather warn you
+now than surprise you later. Your answers on this set are not wasted either way —
+they tell me how much expert opinion converges at all, which is the number that
+decides what we can fairly ask of everyone else.
 
 Thank you — this is genuinely the part the rest of the study rests on.
 
