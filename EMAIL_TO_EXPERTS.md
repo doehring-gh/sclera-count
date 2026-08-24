@@ -29,6 +29,30 @@ are but *where* each one is and whether it is live or dead.
 That reference is what everyone else will be measured against, so it has to come
 from people who know what they are looking at. Hence the four of you.
 
+**Why we cannot just carry on as we were**
+
+Two colleagues already counted the same 64 squares of one field independently.
+The result is uncomfortable:
+
+- On **how many** cells there are, they are close overall — 296 versus 305 — but
+  that agreement is thinner than it looks. They gave an identical number on only
+  **19 of the 64 squares**, and differed by up to 7 in a single square. The totals
+  match largely because the differences cancel out.
+- On **which cells are dead**, they are not close at all: 262 versus 180. That is
+  a one-directional difference, not scatter — one of them calls dead consistently
+  more often, so it does not cancel. It comes out as **11.5% versus 41.0% live**.
+  Nearly 30 percentage points of viability, from the same images.
+- Worst of all, **we cannot tell whether they found the same cells**. The old
+  method recorded only numbers on a tally sheet, so when two people both wrote
+  "9" we have no way of knowing whether they meant the same nine objects. Two
+  counters could disagree completely and still produce identical totals.
+
+That last point is the reason for this exercise. This time every click is recorded
+with its position, so we can match your answers to each other cell by cell and
+say precisely where expert judgement converges and where it does not. It also
+means the live/dead question — clearly the harder one — can be looked at only for
+cells that everyone actually found.
+
 **What it involves — about 20 minutes**
 
 Open your own link (each is different, so your answers come back labelled):
@@ -52,6 +76,8 @@ lose your place; click a dot again to remove it.
 1. **You will see each square three times.** That is deliberate — it tells us how
    reproducible the answer is. Please count each one *fresh* rather than trying to
    remember what you did before. They are shuffled to make that easier.
+   If your three passes disagree with each other, that is useful information and
+   not a failure — it puts a ceiling on what we can fairly ask of anyone else.
 2. **Only click inside the dashed box.** The dimmed border is context so you can
    see cells on the edge. A cell belongs to the square its *centre* falls in.
 3. **Use the brightness slider freely.** Some squares are deliberately deeper in
@@ -79,9 +105,10 @@ everyone else, so if the four of you agree at 85% rather than 95%, the standard 
 hold participants to has to reflect that. I will report those figures anonymously
 (Expert A, B, C, D) unless you would rather be named.
 
-If you know someone else with the right expertise who might be willing, tell me
-and I will send them a link — more independent experts makes the reference
-stronger, not weaker.
+Given how far apart the first two counters turned out to be, I would rather
+over-sample the expert opinion than under-sample it. **If you know someone else
+with the right expertise who might be willing, tell me and I will send them a
+link** — more independent experts makes the reference stronger, not weaker.
 
 Thank you — this is genuinely the part the rest of the study rests on.
 
