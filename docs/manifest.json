@@ -2,7 +2,7 @@
  "schema": "sclera-count-manifest-v1",
  "study": "SCLERA cell count \u2014 TRIAL (feedback only, not used as data) \u2014 reference pass",
  "built_by": "build_segments.py --reference-passes",
- "endpoint": "",
+ "endpoint": "https://script.google.com/macros/s/AKfycbwr7DpVw8Lf6B4nFzZ94CiD7ZPlQyW0yhUXE-Zrh6WlG-gsp6lX98WkUlaZbLfXvdyWhQ/exec",
  "modes": {
   "cells": {
    "label": "Nuclei only",
