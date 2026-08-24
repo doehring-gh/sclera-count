@@ -155,6 +155,72 @@ total-nuclei detection is demonstrably complete. Not yet implemented.
 
 ---
 
+## 4b. Z double-counting — a second, compounding error (2026-08-24)
+
+Raised by Torsten Bossing. Measured with `tools/z_trace.py` on nine consecutive
+slices of `006/1/Image 5`, with nuclei linked across slices by nearest-neighbour
+within 5 µm (the minimum cell diameter in `config.yaml`), one match per slice,
+tolerating a one-slice dropout.
+
+**A nucleus is a 3D object photographed in 5.263 µm slices, so it appears in
+several of them.** Median axial extent **3 slices (15.8 µm)**, maximum **9 slices
+(47.4 µm)**. Summing per-slice counts therefore over-counts by **3.1×** — 2,375
+detections correspond to 767 distinct nuclei.
+
+That alone would only inflate density. The reason it corrupts *viability* is that
+the error is **asymmetric**:
+
+| | mean axial extent |
+|---|---|
+| dead-positive nuclei | 3.88 slices (20.4 µm) |
+| EthD-negative nuclei | 2.58 slices (13.6 µm) |
+| | **1.51×** |
+
+Dead nuclei carry signal in two channels, so they clear threshold over more
+slices and are counted more often. **The dead fraction inflates from 39.6% to
+49.7% — a 10.1 point error**, in the same direction as the depth-sensitivity
+artifact of §4 and compounding it.
+
+Note the linked figure, 39.6% dead → **60.4% viable**, sits in a different place
+from the naive one. The v4 audited pipeline reported ~48% viability for 003/004
+(different specimens), so this is the same order once linking is applied.
+
+### This breaks the current depth design
+
+Two slices sample *different* nuclei only if they are further apart than the
+axial extent:
+
+| separation | nuclei appearing in both |
+|---|---|
+| 10.5 µm | 53.5% |
+| **21.1 µm** (our z05→z09) | **23.2%** |
+| 31.6 µm | 6.4% |
+| 47.4 µm | ~0% |
+
+**The build currently uses z05 and z09 — 21 µm apart — so roughly a quarter of
+nuclei are physically the same objects at both depths.** The "no counter sees one
+location at two depths" rule stops someone recognising the *square*; it does not
+stop them meeting the same *nucleus*.
+
+**And the conflict cannot be resolved inside this tissue as imaged:** clean
+separation needs ~47 µm, but the usable depth range is only 26–47 µm (§3). There
+is no pair of independently-sampled countable depths in these stacks.
+
+That makes the acquisition question — Torsten's Z-correction — load-bearing
+rather than an optimisation. Options: extend the usable range at acquisition;
+section the tissue and image across the cut face; or accept overlap and model it
+explicitly, reporting depth as a within-nucleus rather than between-nucleus
+comparison.
+
+### Why detect-then-link rather than threshold in 3D
+
+A single 3D threshold cannot work here: signal decays steeply with depth (§3), so
+one level is simultaneously too high at the top of the stack and too low at the
+bottom. Detecting per slice against each slice's own noise floor and then linking
+sidesteps that.
+
+---
+
 ## 5. What Maryam and Louise's data actually shows
 
 `analysis/legacy_agreement.py`, on the two .xlsx tally sheets (64 squares, one
