@@ -2,8 +2,11 @@
 
 Working record for the multi-rater counting study and the app that runs it.
 Everything measured, decided, or got wrong, with enough detail to reproduce or
-overturn it. Literature in [REFERENCES.md](REFERENCES.md); build and workflow in
-[README.md](README.md).
+overturn it.
+
+**For where the project currently stands and what it is waiting on, read
+[STATUS.md](STATUS.md) first.** Literature in [REFERENCES.md](REFERENCES.md);
+build and workflow in [README.md](README.md).
 
 Last updated 2026-08-24.
 
@@ -421,9 +424,10 @@ observers differ by 30 points of viability on identical images.
    significantly more damaged than at 90 min. Sclera is far less metabolically
    demanding, so this should not be read across directly, but the window matches.
    Does it matter for scleral fibroblasts? *With the expert panel.*
-5. **Ethics** — participant performance data on identifiable people is the
-   trigger, not the tissue. Pseudonymise participants (R01…R20) before the main
-   round. *Pending FREIC.*
+5. **Ethics** — **applied for 2026-08-24, awaiting PIERC.** The concern was
+   participant performance data on identifiable people, not the tissue. Resolved
+   more strongly than the pseudonymisation originally planned: participants are
+   *anonymous*, holding a code with no key anywhere (§10). *Awaiting approval.*
 6. **`confocal/006/2/Image 11_z09.png` will not download** — refused six times
    while 19 siblings arrived in 18 s. This is the field Maryam and Louise counted,
    so their agreement cannot currently select reference squares. *Likely corrupt
@@ -500,7 +504,92 @@ Two test rows were written during setup and should be deleted from the Sheet:
 
 ---
 
-## 10. Reproducing any of this
+## 10. The ethics application (submitted 2026-08-24)
+
+Title: *Inter- and intra-observer reliability of manual live/dead cell counting in
+confocal images of scleral tissue (SCLERA-LIVE)*. Submitted to PIERC; reference
+pending.
+
+**Scope.** The tissue side needed nothing: porcine eyes were an abattoir
+food-chain by-product, no animals were killed for the study, and ethical review
+confirmed no licence was required (application 4696, approved). The application
+therefore concerns only the human observers. The four experts are collaborators
+contributing a reference standard — two are already co-authors on the wider
+programme — so only the ~20 participants are participants.
+
+**Documents produced**, all in `ethics/`:
+
+| | |
+|---|---|
+| `ANSWERS.md` | every question on the PIERC form, with the free text written to paste |
+| `Participant Information Sheet - SCLERA-LIVE v1.0.docx` | University template, filled in place |
+| `Consent Form - SCLERA-LIVE v1.0.docx` | University template, filled in place |
+| `Risk Assessment - SCLERA-LIVE observer study v1.0.docx` | 8 hazards, highest score 4 (Low) |
+| `DMP_answers.md` | all 13 DCC questions, plan 209838 |
+| `RECRUITMENT_EMAIL_v1.0.txt` | English and German |
+| `CONSENT_PAGE_v1.0.html` + PDF + screenshots | what participants actually see |
+
+The Word templates were **edited in place** rather than recreated, so the
+University header image, fonts, page setup and the risk assessment's scoring
+matrix survive (`tools/fill_docx.py`). ElementTree round-tripping is avoided: it
+rewrites the namespace prefixes a .docx carries and produces files Word will not
+open.
+
+### Three decisions embedded in the paperwork
+
+**Consent is on-screen, not signed.** The template opens with full name and closes
+with a signature. Collecting either would create the participant-to-data link the
+anonymous design exists to prevent, converting anonymous data into personal data.
+Consent is therefore a set of individually ticked statements before the tool will
+open; what is stored is that each was confirmed, with a timestamp, version and
+study code. The departure is *stated on the form* rather than made silently, so a
+reviewer sees a decision rather than an omission.
+
+**A single "by continuing you agree" was rejected.** Browsewrap consent is weaker
+than a committee should accept and makes it hard to evidence that anyone read
+anything. Six individual ticks cost the participant about ten seconds.
+
+**The application was changed to match the paperwork, not the reverse.** The
+declared platform is University OneDrive with no third party. The deployed app was
+still posting to Google Apps Script, so it was rebuilt export-only before any
+document was submitted. Declaring one thing while the software did another would
+have been a false statement on a governance form.
+
+### The consent document generates itself
+
+`tools/export_consent.py` builds the uploadable document directly from the
+application source, so the committee sees exactly what participants see and the
+two cannot drift. Two bugs were caught doing this, both of which would have
+shipped silently: the key regex excluded camelCase, dropping three section
+headings; and `unicode_escape` turned every em-dash and umlaut into mojibake — on
+a document participants read, in German.
+
+### An anonymity landmine, found and closed
+
+Per-counter access keys map a key to a **name**, and the collector stamps that
+name onto every row. That is correct for the named expert panel.
+
+Applied to the participant round it would have been silently catastrophic: it
+would overwrite each participant's anonymous code with a real name, manufacturing
+exactly the link the design exists to prevent. Nothing would have errored. The
+collector now **refuses** that combination, detecting it both from the session's
+identity mode and from the shape of the code itself (`word-word-NN`).
+
+### Residual risks disclosed rather than mitigated away
+
+- **Re-identification by inference.** Timing, display settings and interface
+  language could single out an unusual session in a small pool. Per-participant
+  metadata will not be published at that granularity and timestamps are coarsened.
+- **A lost code means no withdrawal.** Inherent to holding no key. Disclosed
+  before consent, and the app will not start until the participant confirms they
+  have recorded it.
+- **Participants can fail the practice gate.** Unlimited attempts, never reported
+  individually, and the threshold derived from what the experts themselves
+  achieved.
+
+---
+
+## 11. Reproducing any of this
 
 ```bash
 cd ~/Library/CloudStorage/OneDrive-UniversityofPlymouth/JupyterLab/Sclera/SCLERA_CountApp

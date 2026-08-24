@@ -15,7 +15,10 @@ that Maryam and Louise did. Three things change:
 - **Depth is a factor, not a constant.** Squares are sampled at several z levels,
   so you can measure whether countability falls off with depth.
 
-**Start with [FINDINGS.md](FINDINGS.md)** — measurements, decisions and their
+**Start with [STATUS.md](STATUS.md)** — where the project stands, what it is
+waiting on, and what is known-but-not-yet-fixed.
+
+**Then [FINDINGS.md](FINDINGS.md)** — measurements, decisions and their
 reasons, errors and corrections, and what is still open.
 
 **Live now:** https://doehring-gh.github.io/sclera-count/ — currently a PILOT
@@ -33,7 +36,8 @@ SCLERA_CountApp/
 │   ├── manifest.json     written by build_segments.py
 │   └── tiles/            written by build_segments.py
 ├── apps_script/Code.gs   Google Apps Script that collects counts into a Sheet
-├── FINDINGS.md           everything measured, decided, and got wrong — read this first
+├── STATUS.md             where things stand and what is blocking what — read this first
+├── FINDINGS.md           everything measured, decided, and got wrong
 ├── REFERENCES.md         the literature, with what each paper actually supports
 ├── EMAIL_TO_EXPERTS.md   the email to the reference panel, with their links
 ├── study.example.json    point the build at another stain, tissue or depth
