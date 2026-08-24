@@ -227,41 +227,77 @@ Recorded because the corrections are part of the method.
 
 ---
 
-## 7b. Where this study sits in SCLERA-LIVE
+## 7b. Where this study sits (revised 2026-08-24)
 
-The parent project is **SCLERA-LIVE**. The methods manuscript
-(`SCLERA_Detection_Analysis/SCLERA-LIVE_viability_methods_manuscript_v4.md`,
-Courtecuisse, Oehring, Kyte, Zabihi, Glebov, Bossing, Elsheikh — target *Journal
-of Microscopy*) already names this counting study as its own most important
-outstanding work:
+The parent project is **SCLERA-LIVE**. The existing methods manuscript is being
+restructured and **should not be treated as the frame for this study**: the plan
+is now two papers — one showing that current methods fail, and a second
+developing a process for scleral confocal viability.
 
-> "**No hand-annotated real-tissue ground truth.** The synthetic benchmark
-> validates counting when truth is known but does not prove the pipeline counts
-> *sclera* correctly. The most valuable outstanding experiment is manual
-> annotation of ≥3 real fields by ≥2 observers, giving precision/recall and
-> inter-observer agreement of Otsu (and of the co-localisation rule) against
-> human counts." — v4, Limitations
+That changes what the counting study is for.
 
-Two of the paper's headline parameters are explicitly waiting on it: the
-co-localisation overlap threshold (0.50) and the absolute-intensity noise floor
-(50/255), both currently fixed against *synthetic* ground truth only.
+**Under the old framing** it supplied hand-annotated ground truth to pin down two
+parameters of a pipeline already presented as working.
 
-**Ethics scope follows from this.** The tissue side is already settled — v4 §2.1
-records that porcine eyes were an abattoir food-chain by-product, no animals were
-killed for the study, and "ethical review confirmed no licence required". The new
-application is therefore **only** about the human observers: what they are asked
-to do, what is recorded about them, and how they withdraw.
+**Under the new framing it is primary evidence for the first paper.** If capable
+observers cannot reproduce each other — or themselves — on these images, then the
+field's implicit gold standard is not a standard, and every automated method
+validated against a single human's counts inherits that. That is a stronger and
+more interesting claim than parameter-fitting.
 
-The four experts are collaborators contributing a reference standard rather than
-participants; two (Glebov, Bossing) are already co-authors on v4. Only the ~20
-counters are participants, and they are anonymous by design (§9).
+It also means **the study cannot fail**. Low expert agreement is not a spoiled
+reference; it is the result. This matters for how the pass mark is read: a gate
+that comes out at 0.75 rather than 0.90 is a finding about the task, not a
+disappointment.
 
-**A caution on comparing numbers.** The audited pipeline reports ~48% viability
-for specimens 003/004. The crude dead fractions in §4 of this document (72–74% for
-003 at z05) are **not** comparable: that measure samples peaks in the nuclear
-channel and asks whether EthD-1 is bright there, without enforcing the 50%
-co-localisation rule the paper shows is essential. It over-calls dead in exactly
-the way v4 predicts, which is a consistency check rather than a contradiction.
+### The design tension this creates
+
+The participant round can serve two different purposes, and they pull opposite ways:
+
+| purpose | what it needs |
+|---|---|
+| **(a)** quantify how unreliable manual counting naturally is | observers counting **untrained and ungated** — the natural spread is the measurement |
+| **(b)** produce a consensus good enough to evaluate automated methods | observers **trained and gated**, so the reference is as tight as possible |
+
+**A 90% training gate serves (b) and destroys (a).** Selecting for agreement
+manufactures it: after gating you can no longer say anything about natural
+observer variability, because you removed the observers who displayed it.
+
+**Proposed resolution — collect both, in order:**
+
+1. an **ungated first pass** on a small common set, before any training or
+   feedback: this is the "current methods fail" evidence
+2. then the **training round and gate** as already built
+3. then the **gated counting round**: this is the reference for paper two
+
+The before/after difference is itself a result, and it directly tests
+Britten-Jones et al. (2022) — who found consensus training removed systematic
+inter-observer bias in manual corneal cell counting — in a new tissue and with
+position-level rather than count-level agreement.
+
+Not yet implemented. It needs an ungated block presented before the training
+round, with its results kept separate.
+
+### Evidence already in hand for the "current methods fail" paper
+
+- **Maryam vs Louise: 11.5% versus 41.0% viability from identical images** (§5).
+  Two capable people, one field, a 30-point gap in the headline number.
+- Their agreement on totals is **unverifiable** — tally sheets record no positions,
+  so identical totals do not mean the same cells (§5).
+- **Apparent viability falls with depth as a detection artifact**, because dead
+  nuclei carry two channels and outlive live ones as sensitivity drops (§4).
+- **The usable depth range is 26–47 µm, not the ~100 µm the stacks span** (§3), so
+  a viability computed over a whole stack is weighted by where the signal is, not
+  by the tissue.
+
+### Ethics scope is unaffected by the restructure
+
+The tissue side is settled independently of any manuscript: porcine eyes were an
+abattoir food-chain by-product, no animals were killed for the study, and ethical
+review confirmed no licence was required. The new application concerns only the
+human observers — what they are asked to do, what is recorded, and how they
+withdraw. The proposed title describes the observers' task, so it does not depend
+on how the papers are eventually split.
 
 ---
 
