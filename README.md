@@ -230,17 +230,58 @@ nuclei. On crops from `COUNT_field_*_grid.png` — a blurred, upscaled matplotli
 render — they do not: tested against the five squares Maryam and Louise agreed on,
 per-square errors ran from −8 to +7 while the total came out close by luck.
 
-### Making the reference — count them several times
+### How deep is still countable
+
+```bash
+/usr/bin/python3 tools/depth_profile.py --z-levels 3,5,7,9,11,13
+```
+
+Run this **before** choosing `--z-levels` or spending anyone's time. Signal falls
+off with depth at a different rate in every stack, and a square from below that
+point is noise. Measured here:
+
+| stack | deepest slice still countable |
+|---|---|
+| 006/Image 11 | z05 — 26 µm |
+| 006/Image 5 | z09 — 47 µm |
+| 003/Image 5 | z05 — 26 µm |
+| 003/Image 21 | z05 — 26 µm |
+| 003/Image 8 | none of z05–z17 |
+
+So the default `--z-levels 5,9,13,17` is **wrong for this data** — z13 and z17 are
+black in most stacks. A depth study has to sit inside roughly 0–47 µm here, and
+the ladder is worth setting per stack.
+
+The dimness threshold in that tool (p99 < 40) was set by rendering tiles and
+looking at them, not derived: a field at p99 = 31 passed an earlier threshold of
+20 and was visibly black. The peak-finder column is printed beside it as the
+warning — it happily reports 200–400 "nuclei" in fields with nothing in them.
+
+### Making the reference — several experts, several passes each
 
 The reference comes from **your own passes through the app**, not from the
 automated detector. Training counters against the detector would make the whole
 comparison circular.
 
-Count the chosen squares **more than once**. A single pass is one opinion on one
-day, and the gate then holds twenty people to it at 90%. Counting three times and
-keeping only what survives removes the marks you were never sure about — a
-nucleus you found in one pass out of three was not a stable observation, and
-failing someone for missing it measures your noise, not theirs.
+Send the reference set to **several experts**, each counting it **more than
+once**. One pass by one person is one opinion on one day, and the gate then holds
+twenty people to it. Repeats remove the marks nobody was sure about; several
+experts stop one person's habits becoming the definition of truth.
+
+Consensus is built in two stages rather than pooling every pass, because pooling
+lets a generous counter dominate — they contribute a vote per pass to every mark
+only they made:
+
+1. within an expert, a mark survives if it appears in a majority of **their** passes
+2. across experts, it enters the reference if a majority of **experts** found it
+
+Labels are settled separately from positions. A nucleus everyone located but split
+on live/dead becomes `unsure` and is excluded from the label score — nobody should
+fail on a call the experts themselves could not make.
+
+```bash
+/usr/bin/python3 analysis/make_reference.py expert1.json expert2.json expert3.json --manifest docs/manifest.json --out reference_consensus.json
+```
 
 ```bash
 /usr/bin/python3 build_segments.py --from-grid --fields 1 --only-squares F5,E1,F4,F2,G6 --reference-passes 3 --out refbuild --clean
@@ -287,6 +328,20 @@ kept. Two separate scores, because they fail for different reasons:
 |---|---|
 | **number** | how close your total is to the reference, summed over the practice squares |
 | **location** | detection F1 — were they the *same* nuclei, matched by position |
+
+**Do not pick the threshold — derive it.** `make_reference.py` scores each expert
+against the consensus they helped build, which is the most favourable test there
+is and therefore the ceiling. It prints the gate that data supports:
+
+```
+=== the pass mark this data supports ===
+  weakest expert: location 0.935, number 0.882
+  suggested gate: --gate-location 0.90 --gate-count 0.85
+```
+
+In that run a 90% *location* gate was justified but a 90% *number* gate was not —
+the weakest expert only reached 0.88. Setting 90% on both would have failed
+participants for not beating the people defining the answer.
 
 Both must clear `--gate-count` and `--gate-location` (default 0.90). Number alone
 is not enough: marking ten wrong things scores 100% on count and nothing on
