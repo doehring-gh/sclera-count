@@ -224,6 +224,77 @@ sidesteps that.
 
 ---
 
+## 4c. The acquisition fix — Auto Z Brightness Correction (2026-08-24)
+
+Torsten Bossing (Head of Plymouth Light Microscopy Services) answered the
+acquisition question. On the Zeiss software there is an **Auto Z Brightness
+Correction** at the foot of the Z-stack window. With it active you choose which
+parameter to ramp — laser power, **gain**, digital offset or offset — and gain
+gives the strongest amplification. In Live mode you focus through the sample and,
+as the signal darkens, raise the gain and save that setting at that depth,
+repeating so that each depth is about as bright as the surface, using offset to
+stop background climbing with it. On acquisition the software then raises gain
+automatically as the scan goes deeper.
+
+**Ramp gain, not laser power.** Gain amplifies the detected signal; laser power
+would put more light into the sample, bleaching it and adding phototoxicity to a
+*viability* assay — which would change the very thing being measured.
+
+### Why this matters more than image quality
+
+It may resolve the conflict in §4b that looked unresolvable. Independent depth
+samples need roughly 47 µm of separation, but the usable range is only 26–47 µm,
+so no pair of countable, independent depths exists in these stacks. **A gain ramp
+attacks the range rather than the separation:** if countable signal reaches 90 µm
+instead of 47 µm, then z05/z13 (42 µm apart) or z05/z17 (63 µm) become usable and
+the depth design becomes possible. That makes this an unblocking change, not a
+quality improvement.
+
+### What it does not automatically fix, and why
+
+**Gain amplifies noise with signal.** What is lost at depth is signal-to-noise,
+not only brightness. Gain helps where the limit is read noise; it helps much less
+where the limit is scattering and photon shot noise. So a deep slice can be made
+*brighter* without being made more *countable*. This has to be checked on the
+images, not assumed.
+
+**Absolute intensity stops meaning one thing across the stack.** After a ramp, a
+pixel value at 90 µm and the same value at 26 µm represent different amounts of
+fluorophore. Any threshold fixed across the whole stack becomes invalid.
+
+Our analysis happens to already be compatible with this: detection runs per slice
+against **that slice's own noise floor** (§4b), never a stack-wide threshold, for
+exactly the reason that signal decays. A gain ramp is the acquisition-side version
+of the same idea. But two consequences follow:
+
+- the **display stretch** in `build_segments.py` is pooled across a build (§3) so
+  identical objects look identical. With a gain ramp that assumption changes — the
+  images are already equalised, so pooling would now be correcting twice. The
+  build will need to know whether a ramp was used.
+- the **dead/live call** is a comparison between two channels at the same point.
+  If both channels are ramped by the same schedule the comparison survives; if the
+  ramp is set per-channel and they differ, it does not. **The ramp must be recorded
+  and, ideally, identical for both channels.**
+
+### What to ask for in the re-acquisition
+
+1. Auto Z Brightness Correction, ramping **gain**, offset used to hold background
+   flat rather than to lift it.
+2. **The gain schedule saved with the data**, per channel per slice. Without it we
+   cannot tell a bright deep nucleus from a heavily amplified dim one.
+3. **The same schedule on both channels**, or the schedules recorded separately so
+   the live/dead comparison can be corrected.
+4. **One control stack of the same field acquired without the correction.** This is
+   the point that turns "we fixed it" into "we can show we fixed it": with a paired
+   corrected/uncorrected stack, the depth artifact of §4 and the axial-extent
+   asymmetry of §4b can be measured before and after, on the same nuclei.
+5. **Extend the z range** to whatever now yields countable signal, rather than
+   stopping at the old z19.
+
+Points 2 and 4 are the ones most likely to be skipped and most expensive to lack.
+
+---
+
 ## 5. What Maryam and Louise's data actually shows
 
 `analysis/legacy_agreement.py`, on the two .xlsx tally sheets (64 squares, one

@@ -24,13 +24,21 @@ tissue.** Everything downstream of those is written and tested.
 | **PIERC approval** | submitted, reference pending | the participant round |
 | **Expert panel — staining** | keep Hoechst + EthD-1, or move? | which images the reference is built on |
 | **Expert panel — section or not** | sectioning buys depth, costs a cut-face artifact | the whole depth design |
-| **Expert panel — acquisition** | Torsten raised Z-correction on the LSM 900 | see the unresolved conflict below |
+| **Expert panel — acquisition** | **answered** — Auto Z Brightness Correction, ramp gain (FINDINGS §4c) | re-acquisition, then the depth design |
 | **Matt, Konstantin, Claudia** | trial sent, no reply yet | expert consensus reference |
 
-Torsten has replied on four points: the greyscale channel should be the default
-(agreed, not yet done), red/green overlays are a poor basis for counting (agreed),
-Z-correction at acquisition, and why not just use ImageJ (answered in
-FINDINGS §7c — the argument is validation, not capability).
+Torsten has replied twice. First on four points: greyscale should be the default
+view (agreed, not yet done), colour-coded overlays are a poor basis for counting
+(agreed — the markers need a shape difference too), Z-correction at acquisition,
+and why not just use ImageJ (answered in FINDINGS §7c — the argument is validation,
+not capability).
+
+Then with the acquisition answer: **Auto Z Brightness Correction, ramping gain**,
+saving a setting at each depth so the deep slices come out about as bright as the
+surface (FINDINGS §4c). This is potentially unblocking rather than cosmetic — see
+item 1 below. Reply drafted in `correspondence/REPLY_TO_TORSTEN_2.md`, asking
+whether gain recovers countability or only brightness, and whether both channels
+can share one schedule.
 
 ---
 
@@ -65,15 +73,19 @@ All tested, nothing outstanding:
 
 Ordered by how much they matter.
 
-**1. The depth design has an unresolved conflict (FINDINGS §4b).**
+**1. The depth design is blocked on re-acquisition (FINDINGS §4b, §4c).**
 Nuclei span a median of 3 slices (15.8 µm), so two depths only sample different
 nuclei if they are ~47 µm apart — but the usable depth range is only 26–47 µm.
 The current reference build uses z05 and z09, 21 µm apart, where **roughly a
 quarter of nuclei are physically the same object at both depths**. The
 "no counter sees one location at two depths" rule prevents recognising a *square*;
-it does not prevent meeting the same *nucleus*. This cannot be resolved inside
-this tissue as imaged, which is why the acquisition question is load-bearing
-rather than an optimisation.
+it does not prevent meeting the same *nucleus*.
+
+**Torsten's gain ramp may remove this**, by extending countable range rather than
+changing separation: countable signal to ~90 µm would make z05/z17 independent at
+63 µm. That is conditional and must be verified with `tools/depth_profile.py` on
+the new stacks before the depth design is rebuilt on it. **Do not build the depth
+comparison on the current images.**
 
 **2. No sensitivity floor for per-slice viability (FINDINGS §4).**
 Apparent dead fraction rises with depth because dead nuclei are brighter and
@@ -127,12 +139,19 @@ and are regenerable; they could be gitignored like `testbuild/`.
 
 ---
 
-## The next three things, in order
+## The next four things, in order
 
-1. Chase Matt, Konstantin and Claudia for trial feedback; settle staining and
+1. **Re-acquire with Auto Z Brightness Correction** (FINDINGS §4c). Ask Louise
+   for: gain ramp saved with the data per channel per slice; the same schedule on
+   both channels if possible; **one control stack of the same field with the
+   correction off**; and an extended z range. The control stack is the one that
+   turns "we fixed it" into "we can show we fixed it", and it is the request most
+   likely to be dropped.
+2. Make the greyscale channel the default and give the markers a shape difference
+   as well as colour — both small, both promised to Torsten, and both should land
+   before anything goes to twenty people.
+3. Chase Matt, Konstantin and Claudia for trial feedback; settle staining and
    sectioning with the panel.
-2. Make the greyscale channel the default and fix the marker colours — both are
-   small, both were promised, and both should land before anything goes to twenty
-   people.
-3. On PIERC approval: build the reference pass, run it with the panel, derive the
-   gate from `make_reference.py`, then open the participant round.
+4. On PIERC approval and new images: verify countable depth, rebuild the reference
+   pass, run it with the panel, derive the gate from `make_reference.py`, then open
+   the participant round.
