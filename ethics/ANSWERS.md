@@ -8,6 +8,15 @@ Free text is written to paste straight in. Anything I could not know is marked
 
 **Read the three decisions in §0 first: they change several answers below.**
 
+> **RESOLVED 2026-08-24:**
+> **(a)** Participants are from Daniela's personal network, **outside any line
+> management or power relationship** — so S07 stays "None of the above",
+> vulnerability **Minimal**, expedited review argument holds as written.
+> **(b)** Collection will be declared as **Microsoft Excel / OneDrive**. Do not
+> name Google or any non-approved platform. See the amended B22, A11, A13 below.
+> **(c)** Matt, Claudia, Torsten and Konstantin are **all internal UoP staff**, so
+> they go in **P06**, not A05. A05 remains Yes for Ahmed Elsheikh (Liverpool) only.
+
 ---
 
 ## 0. Three things to settle before filling this in
@@ -97,7 +106,8 @@ Faculty: **Health** (School of Health Professions).
 **P06** select: **Yes** — other UoP investigators.
 List: Emilie Courtecuisse, Adam Kyte (School of Engineering, Computing and
 Mathematics), Niloufar Zabihi, Konstantin Glebov (Peninsula Medical School),
-Torsten Bossing (Peninsula Medical School). Add Matt and Claudia if UoP.
+Torsten Bossing (Peninsula Medical School), Matt [surname], Claudia [surname] —
+all internal staff.
 
 ---
 
@@ -109,7 +119,8 @@ Torsten Bossing (Peninsula Medical School). Add Matt and Claudia if UoP.
 
 **A04** select: **No**
 
-**A05** select: **Yes**. Text:
+**A05** select: **Yes** — for Ahmed Elsheikh only; all other collaborators are
+internal and belong in P06. Text:
 
 > Professor Ahmed Elsheikh (School of Engineering, University of Liverpool) is a
 > collaborator and co-author on the wider SCLERA-LIVE programme. Members of the
@@ -143,13 +154,11 @@ Torsten Bossing (Peninsula Medical School). Add Matt and Claudia if UoP.
 > **Data Ownership.** The University of Plymouth, with Dr Daniela Oehring as
 > Principal Investigator and data steward.
 >
-> **Data Storage.** Working data and analysis code are held in the PI's
-> University OneDrive for Business, which is backed up by the institution.
-> Annotation data submitted through the counting application is written to a
-> [Microsoft Forms / a Google Sheet — see §0b] accessible only to the PI, and is
-> exported to OneDrive for analysis. The confocal image stacks being annotated
-> are existing files from the approved animal-tissue work and contain no personal
-> data.
+> **Data Storage.** All data and analysis code are held in the PI's University
+> OneDrive for Business, which is backed up by the institution. Annotation data is
+> returned by participants as an exported file and stored there in Microsoft Excel
+> workbooks. The confocal image stacks being annotated are existing files from the
+> approved animal-tissue work and contain no personal data.
 >
 > **Data Security.** University accounts with multi-factor authentication and
 > full-disk encryption on all devices. The collection endpoint accepts writes
@@ -171,18 +180,15 @@ Torsten Bossing (Peninsula Medical School). Add Matt and Claudia if UoP.
 
 **A12** **[YOU]** — upload the DMP Online PDF.
 
-**A13** select: **Yes**
+**A13** select: **No**
 
-> Annotation data is transmitted from the participant's browser to
-> [the collection platform] for storage. Under the current configuration this is
-> Google Apps Script writing to a Google Sheet controlled by the PI; the data
-> transmitted is anonymous, containing only a self-generated code, counts,
-> coordinates within an image tile, and timing. The static web application is
-> served from GitHub Pages, which hosts the image tiles and code but receives no
-> submitted data. No personal data is shared with either provider.
+> Data is held only in University systems (OneDrive for Business). No data is
+> shared with or received from any third-party organisation.
 
-*Under §0b option 1 this becomes a much shorter answer naming only the University
-platform.*
+*This answer depends on the app running in export-only mode — participants
+download their own file and return it — with no automatic submission to any
+external service. That must actually be the configuration before this is
+submitted. See the handover note.*
 
 **A16** select: **No**
 
@@ -483,12 +489,13 @@ yet written. B16 debrief: recommend a short on-screen debrief at completion.
 > using their own computer, tablet or phone. There is no in-person data
 > collection and no University premises are used for participant contact.
 
-**B22** tick **Other** *(and OneDrive)*, specify:
+**B22** tick **OneDrive**, and **Other**, specify:
 
-> Custom static web application served from GitHub Pages, with annotation data
-> submitted to [Google Apps Script writing to a Google Sheet controlled by the PI
-> — or the University-hosted alternative, see §0b]. Working data and analysis in
-> the PI's University OneDrive. Analysis in Python.
+> Annotation data is exported by each participant as a spreadsheet file and held
+> in Microsoft Excel workbooks in the Principal Investigator's University OneDrive
+> for Business. Analysis is carried out in Python on University equipment. The
+> participant-facing counting interface is a static web page containing no
+> server-side component and storing no data itself.
 
 **B23 Dissemination:**
 
@@ -789,7 +796,34 @@ on you personally — if you are HCPC-registered you may prefer Yes)*
 
 ---
 
-## The 8 things I could not answer
+## Handover — what is left
+
+**Templates now in this folder, to fill in one at a time:**
+
+| file | form question |
+|---|---|
+| `2026 PIS Template V2.1.docx` | B14 Participant Information Sheet |
+| `2026 ICF Template V2.0.docx` | B15 Consent Form |
+| `Risk Assessment Form (MASTER COPY...).docx` | C01, and D01 |
+| DMP (via DMP Online) | A12 |
+
+Everything needed to write the PIS and ICF is already in this document: the
+anonymous-code mechanism and its two consequences, the withdrawal cut-off, the
+practice-gate framing, and the accessibility provisions.
+
+**One code change required before submitting**, so that A13 "No" is true: rebuild
+the app **without `--endpoint`**, so it runs in export-only mode and no data goes
+to any external service. Participants download their file and return it.
+
+```bash
+/usr/bin/python3 build_segments.py --stacks "006/Image 5" --z-levels 5,9 --squares-per-field 3 --reference-passes 3 --identity code --study "SCLERA cell count" --out docs --clean
+```
+
+**Also worth doing before anyone else sees it** (from Torsten's feedback): make
+the greyscale nuclei channel the default view for `livedead` mode rather than the
+merged view — currently `"default_layer": "merged"` in `MODES_BY_SCHEME`.
+
+## The remaining things I could not answer
 
 1. **P03** — project start, end, and data-collection start dates
 2. **P05** — your GDPR training completed and still in date?
