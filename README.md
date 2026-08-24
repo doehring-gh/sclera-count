@@ -552,6 +552,13 @@ Counts then land in the Sheet by themselves: progress is sent every 15 squares
 and again at the end, and rows are upserted on (rater, block, mode, segment) so
 resending never duplicates.
 
+**The endpoint is public.** It sits in `docs/manifest.json`, which is served from
+a public site, so anyone who looks could post junk to your Sheet. That is inherent
+to a static page writing anywhere — there is nowhere to hide a secret. It only
+appends rows, and `rater` identifies real contributions, so the practical answer
+is: check the Sheet at the end of the round, and **undeploy the web app** (Apps
+Script → Deploy → Manage deployments → Archive) once collection is finished.
+
 **Without an endpoint the app still works** — it runs in export-only mode and each
 person emails you three files. The Download button is always there regardless.
 

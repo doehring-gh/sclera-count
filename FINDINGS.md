@@ -249,7 +249,30 @@ Recorded because the corrections are part of the method.
 
 ---
 
-## 9. Reproducing any of this
+## 9. Data collection
+
+Counts post themselves to a Google Apps Script web app that appends to a Sheet
+Daniela owns (`apps_script/Code.gs`, deployed 2026-08-24). Verified from the live
+site end to end: the app reported a confirmed `sent ✓` — Apps Script's 302 to
+`script.googleusercontent.com` carries `access-control-allow-origin: *`, so the
+page can read the reply rather than falling back to the opaque no-cors path.
+
+Rows upsert on (rater, block, mode, segment, marker), so resending or resuming
+replaces earlier rows rather than duplicating them.
+
+**GitHub was not an option and should not be revisited.** Pages is a static file
+server; writing to the repository from the page would require a write-scoped token
+embedded in a public page.
+
+The endpoint URL is public in `manifest.json` by necessity. Undeploy the web app
+once collection is finished.
+
+Two test rows were written during setup and should be deleted from the Sheet:
+`__TEST__` and `CONNECTIVITY_CHECK`.
+
+---
+
+## 10. Reproducing any of this
 
 ```bash
 cd ~/Library/CloudStorage/OneDrive-UniversityofPlymouth/JupyterLab/Sclera/SCLERA_CountApp
