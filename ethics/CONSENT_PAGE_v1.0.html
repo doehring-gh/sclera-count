@@ -9,6 +9,11 @@
  .note{background:#f4f7fb;border-left:3px solid #2f6fed;padding:.9em 1.1em;font-size:14px}
  code{font-family:ui-monospace,Menlo,monospace}
  .lang{page-break-before:always;border-top:2px solid #111;margin-top:3em;padding-top:2em}
+ /* printed for the ethics upload: no browser chrome, and headings kept with
+    the text that follows them */
+ @page{margin:16mm 14mm;size:A4}
+ @media print{ body{margin:0;max-width:none;font-size:11pt}
+               h1,h2,h3{break-after:avoid} .note{break-inside:avoid} }
 </style>
 <h1>Participant information and consent</h1>
 <p class="meta">Inter- and intra-observer reliability of manual live/dead cell

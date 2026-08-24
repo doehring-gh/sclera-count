@@ -109,7 +109,21 @@ function doPost(e) {
       return json({ok: false, error: 'rows missing rater or segment'});
     }
 
-    // The key decides whose name goes in the sheet, not the typed one.
+    // The key decides whose name goes in the sheet, not the typed one -- but ONLY
+    // for the named expert panel.
+    //
+    // In the participant round the rater IS the anonymous code, and there is
+    // deliberately no record anywhere linking that code to a person. Writing a
+    // name over it would manufacture exactly that link and destroy the anonymity
+    // the study is built on, silently and irreversibly. So refuse, and say why.
+    var anonymous = (payload.session && payload.session.identity === 'code') ||
+                    summary.concat(markers).some(function (r) {
+                      return /^[a-z]+-[a-z]+-\d+$/.test(String(r.rater || ''));
+                    });
+    if (verifiedName && anonymous) {
+      return json({ok: false, error: 'refused: access keys identify the counter, ' +
+                   'so they must not be used for the anonymous participant round'});
+    }
     if (verifiedName) {
       summary.forEach(function (r) { r.rater = verifiedName; });
       markers.forEach(function (r) { r.rater = verifiedName; });

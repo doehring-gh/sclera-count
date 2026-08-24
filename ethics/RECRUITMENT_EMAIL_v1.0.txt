@@ -1,0 +1,237 @@
+RECRUITMENT EMAIL — v1.0 — 2026-08-24
+Study: Inter- and intra-observer reliability of manual live/dead cell counting
+       in confocal images of scleral tissue (SCLERA-LIVE)
+PI:    Dr Daniela Oehring, School of Health Professions, University of Plymouth
+
+For PIERC question B09/B10 (recruitment materials). English first, German below —
+send whichever fits the recipient, or both in one message.
+
+Fields to complete before sending are marked <like this>.
+
+================================================================================
+ENGLISH
+================================================================================
+
+Subject: Would you count some cells for me? About 30 minutes, anonymous, no
+         expertise needed
+
+Hello,
+
+I am writing to ask whether you would be willing to help with a study I am
+running at the University of Plymouth. Please read to the end before deciding —
+and please feel free to ignore this if it does not appeal. I will not know who
+took part and who did not, and it makes no difference to me either way.
+
+WHAT IT IS ABOUT
+
+When researchers want to know how many cells in a piece of tissue are alive and
+how many are dead, somebody usually counts them by eye in microscope images.
+That human count is then treated as the correct answer, and computer programs
+written to do the job automatically get judged against it.
+
+We have reason to think that answer is shakier than it looks. Two experienced
+colleagues separately counted the same images and came to very different
+conclusions — one thought about 12% of the cells were alive, the other about 41%.
+Identical pictures.
+
+So I am asking a simple question: how consistently do people actually count cells
+in these images? To answer it I need a group of people to each count the same
+kind of images independently.
+
+WHAT YOU WOULD DO
+
+Open a link, read a short page explaining how to count, and then click on the
+cells you can see in a series of small microscope images, saying whether each one
+looks alive, dead, or you are not sure.
+
+  - It takes about 20 to 40 minutes.
+  - It works in any web browser, on a computer, tablet or phone. Nothing to
+    install.
+  - You need no expertise at all. How well people without a microscopy
+    background do this is part of what I am measuring.
+  - You can stop at any point and pick up later.
+  - It is available in English and German.
+
+WHAT I WOULD KNOW ABOUT YOU
+
+Nothing. The study is anonymous by design. The web page gives you a random code
+such as "amber-larch-63" and that is the only label on your answers. I do not ask
+for your name, your email address, or anything else. There is no list anywhere
+linking codes to people, so I could not work out who you are even if I wanted to.
+
+That does mean one thing worth knowing in advance: if you later want your data
+deleted, you have to quote that code, because it is the only way to find your
+answers. The page asks you to write it down before you start.
+
+BEING STRAIGHT WITH YOU
+
+  - There is no payment, voucher or prize draw. It is unpaid.
+  - There is no personal benefit to you.
+  - There is a short practice round, and it is possible not to pass it first
+    time. You can retry as often as you like, nothing happens if you do not
+    pass, and because the study is anonymous nobody — including me — can tell
+    who that was.
+  - Saying no has no consequence whatsoever, and you do not need to give a
+    reason. I would genuinely rather you declined than felt obliged.
+
+I am not able to recruit anyone I supervise, teach, assess or line manage, so if
+that describes our working relationship, please disregard this — it is not that
+your help would be unwelcome, but that I should not be asking.
+
+IF YOU WOULD LIKE TO TAKE PART
+
+<Option A — link in the email:>
+Here is the link: <LINK>
+Full details and the consent questions are on the first screen, and nothing is
+recorded until you agree to them.
+
+<Option B — link on request:>
+Just reply to this email and I will send you the link. Full details and the
+consent questions are on the first screen, and nothing is recorded until you
+agree to them.
+
+Any questions, please just ask.
+
+With thanks,
+Daniela
+
+Dr Daniela Oehring
+School of Health Professions, University of Plymouth
+daniela.oehring@plymouth.ac.uk
+
+If you have concerns about how this study is being run, you can contact the
+Research Ethics Administration, University of Plymouth, Drake Circus, Plymouth
+PL4 8AA — Research.Ethics@plymouth.ac.uk
+Ethics reference: <REACH number>
+
+
+================================================================================
+DEUTSCH
+================================================================================
+
+Betreff: Würden Sie für mich ein paar Zellen zählen? Etwa 30 Minuten, anonym,
+         keine Vorkenntnisse nötig
+
+Hallo,
+
+ich möchte fragen, ob Sie mir bei einer Studie helfen würden, die ich an der
+University of Plymouth durchführe. Bitte lesen Sie bis zum Ende, bevor Sie
+entscheiden — und sagen Sie ruhig ab, wenn es Ihnen nicht zusagt. Ich werde
+ohnehin nicht erfahren, wer teilgenommen hat und wer nicht.
+
+WORUM ES GEHT
+
+Wenn man wissen will, wie viele Zellen in einem Gewebe leben und wie viele tot
+sind, zählt sie üblicherweise jemand mit dem Auge in Mikroskopbildern aus. Dieses
+menschliche Ergebnis gilt dann als die richtige Antwort — und daran werden
+Computerprogramme gemessen, die diese Aufgabe automatisch erledigen sollen.
+
+Wir haben Grund zu der Annahme, dass diese Antwort weniger belastbar ist, als sie
+wirkt. Zwei erfahrene Kolleginnen haben dieselben Bilder unabhängig voneinander
+ausgezählt und kamen zu sehr unterschiedlichen Ergebnissen: die eine auf etwa 12%
+lebende Zellen, die andere auf etwa 41%. Bei identischen Bildern.
+
+Deshalb stelle ich eine einfache Frage: Wie einheitlich zählen Menschen Zellen in
+solchen Bildern tatsächlich? Dafür brauche ich mehrere Personen, die dieselbe Art
+von Bildern unabhängig voneinander auszählen.
+
+WAS SIE TUN WÜRDEN
+
+Einen Link öffnen, eine kurze Anleitung lesen und dann in mehreren kleinen
+Mikroskopbildern die erkennbaren Zellen anklicken und jeweils angeben, ob sie
+lebend, tot oder unsicher erscheinen.
+
+  - Das dauert etwa 20 bis 40 Minuten.
+  - Es läuft in jedem Webbrowser, auf Computer, Tablet oder Handy. Es wird
+    nichts installiert.
+  - Sie brauchen keinerlei Vorkenntnisse. Wie gut Menschen ohne
+    Mikroskopie-Hintergrund das können, ist Teil dessen, was ich messe.
+  - Sie können jederzeit aufhören und später weitermachen.
+  - Die Seite gibt es auf Deutsch und auf Englisch.
+
+WAS ICH ÜBER SIE ERFAHREN WÜRDE
+
+Nichts. Die Studie ist von Grund auf anonym angelegt. Die Webseite gibt Ihnen
+einen zufälligen Code wie „amber-larch-63“, und das ist die einzige Kennzeichnung
+Ihrer Antworten. Ich frage weder Namen noch E-Mail-Adresse noch sonst etwas. Es
+existiert nirgends eine Liste, die Codes mit Personen verbindet — ich könnte also
+selbst dann nicht herausfinden, wer Sie sind, wenn ich es wollte.
+
+Daraus folgt allerdings eines, das Sie vorher wissen sollten: Wenn Sie Ihre Daten
+später löschen lassen möchten, müssen Sie diesen Code angeben, denn nur darüber
+lassen sich Ihre Antworten wiederfinden. Die Seite bittet Sie deshalb, ihn vor
+dem Start zu notieren.
+
+OFFEN GESAGT
+
+  - Es gibt keine Bezahlung, keine Gutscheine und keine Verlosung. Die Teilnahme
+    ist unbezahlt.
+  - Sie haben keinen persönlichen Nutzen davon.
+  - Es gibt eine kurze Übungsrunde, und es ist möglich, sie nicht auf Anhieb zu
+    bestehen. Sie können beliebig oft wiederholen, das Nichtbestehen hat keine
+    Folgen, und da die Studie anonym ist, kann niemand — auch ich nicht —
+    erkennen, wen es betraf.
+  - Eine Absage hat keinerlei Konsequenzen, und Sie müssen sie nicht begründen.
+    Mir ist eine Absage deutlich lieber als eine Zusage aus Verpflichtungsgefühl.
+
+Ich darf niemanden gewinnen, den ich betreue, unterrichte, bewerte oder führe.
+Falls das auf unser Arbeitsverhältnis zutrifft, betrachten Sie diese Nachricht
+bitte als gegenstandslos — nicht weil Ihre Hilfe unwillkommen wäre, sondern weil
+ich nicht fragen sollte.
+
+WENN SIE TEILNEHMEN MÖCHTEN
+
+<Variante A — Link in der E-Mail:>
+Hier ist der Link: <LINK>
+Die vollständigen Angaben und die Einwilligungspunkte stehen auf der ersten
+Seite; es wird nichts gespeichert, bevor Sie zugestimmt haben.
+
+<Variante B — Link auf Anfrage:>
+Antworten Sie einfach auf diese E-Mail, dann schicke ich Ihnen den Link. Die
+vollständigen Angaben und die Einwilligungspunkte stehen auf der ersten Seite; es
+wird nichts gespeichert, bevor Sie zugestimmt haben.
+
+Bei Fragen melden Sie sich gerne.
+
+Herzlichen Dank,
+Daniela
+
+Dr Daniela Oehring
+School of Health Professions, University of Plymouth
+daniela.oehring@plymouth.ac.uk
+
+Bei Bedenken zur Durchführung dieser Studie können Sie sich an die Research
+Ethics Administration, University of Plymouth, Drake Circus, Plymouth PL4 8AA
+wenden — Research.Ethics@plymouth.ac.uk
+Ethik-Referenz: <REACH-Nummer>
+
+
+================================================================================
+NOTES — NOT PART OF THE EMAIL
+================================================================================
+
+Why it is worded this way, in case PIERC asks about B11 (fair and non-coercive
+recruitment):
+
+  - It states twice that declining has no consequence, and once that a refusal
+    is genuinely preferred over a reluctant yes.
+  - It excludes supervisees, students, appraisees and direct reports in the body
+    of the email itself, so the exclusion is visible to the recipient rather
+    than only asserted on the form.
+  - It says plainly there is no payment and no personal benefit, rather than
+    implying a benefit that does not exist.
+  - It discloses the practice round and the possibility of not passing before
+    anyone commits, rather than at the point they meet it.
+  - It gives the time cost honestly as a range, not a best case.
+  - It contains no deadline, no reminder-chasing language, and no appeal to
+    obligation or reciprocity.
+
+Two practical points:
+
+  - Send it individually or BCC. A visible group recruitment email would let
+    recipients see who else was asked, which weakens the anonymity the study
+    depends on.
+  - Do NOT use per-person access keys for the participant round. They exist for
+    the named expert panel, where the key identifies the counter on purpose.
+    Attaching one to a participant would tie a real person to their answers and
+    destroy the anonymity this whole design rests on.

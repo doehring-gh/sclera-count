@@ -1100,6 +1100,7 @@ function newSession(){
     study:M.study, rater:raterId(), block, mode,
     started_utc:nowISO(), finished_utc:null, submitted_utc:null,
     key:ACCESS_KEY,
+    identity:identityMode(),
     consent:consentRecord,
     n_training:train.length,
     training_attempts:1, training_passed:false, training_score:null,
