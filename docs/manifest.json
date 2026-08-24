@@ -1,6 +1,6 @@
 {
  "schema": "sclera-count-manifest-v1",
- "study": "SCLERA reference \u2014 expert pass (6 squares, 3 rounds) \u2014 reference pass",
+ "study": "SCLERA cell count \u2014 reference pass",
  "built_by": "build_segments.py --reference-passes",
  "endpoint": "",
  "modes": {
