@@ -1,6 +1,6 @@
 # Where this project stands
 
-**Last updated 2026-08-24.** Read this first after any gap. The reasoning behind
+**Last updated 2026-08-25.** Read this first after any gap. The reasoning behind
 everything here is in [FINDINGS.md](FINDINGS.md); the build and workflow are in
 [README.md](README.md).
 
@@ -24,21 +24,47 @@ tissue.** Everything downstream of those is written and tested.
 | **PIERC approval** | submitted, reference pending | the participant round |
 | **Expert panel — staining** | keep Hoechst + EthD-1, or move? | which images the reference is built on |
 | **Expert panel — section or not** | sectioning buys depth, costs a cut-face artifact | the whole depth design |
-| **Expert panel — acquisition** | **answered** — Auto Z Brightness Correction, ramp gain (FINDINGS §4c) | re-acquisition, then the depth design |
+| **Expert panel — acquisition** | **answered in full** — ramp gain, per-channel, control stack endorsed (FINDINGS §4c) | nothing; protocol written for Louise |
+| **Louise — re-acquisition** | protocol ready to send, not yet sent | the depth design, the reference build |
 | **Matt, Konstantin, Claudia** | trial sent, no reply yet | expert consensus reference |
 
-Torsten has replied twice. First on four points: greyscale should be the default
-view (agreed, not yet done), colour-coded overlays are a poor basis for counting
-(agreed — the markers need a shape difference too), Z-correction at acquisition,
-and why not just use ImageJ (answered in FINDINGS §7c — the argument is validation,
-not capability).
+Torsten has replied three times, and every reply changed something.
 
-Then with the acquisition answer: **Auto Z Brightness Correction, ramping gain**,
-saving a setting at each depth so the deep slices come out about as bright as the
-surface (FINDINGS §4c). This is potentially unblocking rather than cosmetic — see
-item 1 below. Reply drafted in `correspondence/REPLY_TO_TORSTEN_2.md`, asking
-whether gain recovers countability or only brightness, and whether both channels
-can share one schedule.
+**First**, on the interface: greyscale should be the default counting view, and
+colour-coded overlays are a poor basis for accurate counting. **Both are now
+done** (items 3 and 4 below, closed). He also asked why not just use ImageJ —
+answered in FINDINGS §7c, and revisited below.
+
+**Second**, the acquisition answer: **Auto Z Brightness Correction, ramping gain**,
+saving a setting at each depth so deep slices come out about as bright as the
+surface. Potentially unblocking rather than cosmetic — see item 1.
+
+**Third** (2026-08-25), answering both follow-ups. Channels are ramped
+**separately, each to its own surface brightness** — which is better than the
+shared schedule we asked for, and revealed we had the wrong model of our own
+measurement. He confirms there is a gain level where the image goes artificial but
+judges it by eye; he endorses the control stack; and he recommends **3D Analyse in
+ImageJ** for the overlap problem.
+
+Three things came out of working through that reply, all in FINDINGS §4c:
+
+- **The ramp cannot be validated from our existing images.** Simulating gain is
+  structurally vacuous — detection thresholds against each slice's own noise, so
+  multiplying scales signal, background and noise together and the detected set is
+  unchanged (measured: identical object count from x1 to x8). Real gain acts before
+  the ADC. **So the paired control stack is not good practice, it is the only
+  available evidence.** It must not be dropped.
+- **`depth_profile.py` would have gone silently blind on ramped data**, because it
+  judged countability by absolute brightness and a ramp holds brightness constant
+  by design. Fixed: it now also reports contrast and a noise-referenced ratio, with
+  `--ramped` to switch the verdict. Both thresholds need re-deriving on new stacks.
+- **His 3D suggestion converts an assumption into a measurement.** It does not help
+  the human study (counters see 2D tiles), but instead of inferring depth overlap
+  from the *median* axial extent of a nucleus, we can measure what fraction of
+  nuclei actually appear at both of two candidate depths. Worth doing either way.
+
+Replies drafted: `correspondence/REPLY_TO_TORSTEN_3.md`. Acquisition protocol for
+Louise: `correspondence/ACQUISITION_REQUEST_LOUISE.md`.
 
 ---
 
@@ -92,14 +118,14 @@ Apparent dead fraction rises with depth because dead nuclei are brighter and
 outlive live ones as sensitivity falls. Reporting viability per z-slice without
 bounding this would publish an artifact. Unsolved.
 
-**3. Greyscale nuclei channel is not the default.**
-Promised to Torsten. The merged view is for orientation; counting should happen
-on the single greyscale channel. One-line change, not yet made.
+**3. ~~Greyscale nuclei channel is not the default.~~ DONE 2026-08-25.**
+Counting now opens on the greyscale Hoechst view; merged is one key away for
+orientation. Prompts updated in both languages.
 
-**4. Marker colours are distinguished only by hue.**
-Live blue / dead red / unsure yellow. Around one man in twelve cannot rely on a
-red–green pair, and colour-only coding is weak generally. Needs a shape or fill
-difference as well as colour.
+**4. ~~Marker colours are distinguished only by hue.~~ DONE 2026-08-25.**
+Live is a circle, dead a square, unsure a triangle — shown in the palette and
+taught on a marker key on the "How to count" page. Colour now reinforces the
+shape rather than carrying the meaning alone.
 
 **5. No ungated first pass (FINDINGS §7b).**
 The training gate optimises the reference but destroys any claim about *natural*
@@ -112,7 +138,14 @@ Refused seven times while 19 siblings arrived in 18 seconds. This is the field
 Maryam and Louise counted, so their agreement cannot currently be used to select
 reference squares. Probably corrupt server-side.
 
-**7. Housekeeping.** `refbuild/` and `refsrc/` build outputs are tracked in git
+**7. Countability thresholds are eyeballed, and the new one is transferred
+(FINDINGS §4c).** `DIM_P99 = 40` was calibrated by looking at tiles. The new
+`DIM_CNR = 9.0` is transferred from it rather than derived, and does not separate
+the groups cleanly — two slices sit in the overlap and may be cases where the
+*brightness* rule is wrong. Re-derive both on the new stacks; look at those two
+tiles by eye first.
+
+**8. Housekeeping.** `refbuild/` and `refsrc/` build outputs are tracked in git
 and are regenerable; they could be gitignored like `testbuild/`.
 
 ---
@@ -141,17 +174,16 @@ and are regenerable; they could be gitignored like `testbuild/`.
 
 ## The next four things, in order
 
-1. **Re-acquire with Auto Z Brightness Correction** (FINDINGS §4c). Ask Louise
-   for: gain ramp saved with the data per channel per slice; the same schedule on
-   both channels if possible; **one control stack of the same field with the
-   correction off**; and an extended z range. The control stack is the one that
-   turns "we fixed it" into "we can show we fixed it", and it is the request most
-   likely to be dropped.
-2. Make the greyscale channel the default and give the markers a shape difference
-   as well as colour — both small, both promised to Torsten, and both should land
-   before anything goes to twenty people.
+1. **Send Louise the acquisition protocol** — `correspondence/ACQUISITION_REQUEST_LOUISE.md`
+   is written and ready. The load-bearing items are the **saved gain and background
+   per channel per slice** and the **one control stack with the correction off**;
+   both are the easiest to drop and the control stack is now the only thing that
+   can tell us whether the ramp worked at all.
+2. **Send Torsten the third reply** (`REPLY_TO_TORSTEN_3.md`) with the two interface
+   figures from `for_torsten/`, if the short note has not already gone.
 3. Chase Matt, Konstantin and Claudia for trial feedback; settle staining and
-   sectioning with the panel.
-4. On PIERC approval and new images: verify countable depth, rebuild the reference
-   pass, run it with the panel, derive the gate from `make_reference.py`, then open
-   the participant round.
+   sectioning with the panel. **Staining is the older blocker and has been open
+   longest** — it decides which images the reference is built on.
+4. On new images: run `depth_profile.py --ramped`, re-derive both thresholds,
+   measure real depth overlap by 3D linking rather than assuming it, then rebuild
+   the reference pass. Only after that does the depth design get committed to.

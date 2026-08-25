@@ -293,6 +293,123 @@ of the same idea. But two consequences follow:
 
 Points 2 and 4 are the ones most likely to be skipped and most expensive to lack.
 
+### Torsten's second answer (2026-08-25), and two corrections to the above
+
+He answered both questions. Quoting the operative parts: *"Always take the surface
+Z-slice as your aim. The deeper slices should aim for the same brightness. Channels
+can be adjusted separately i.e. the EthD should be kept as bright as the surface
+slice. If the gain gets too strong which results in more pixelated images you can
+increase Average or close the Offset a little (not beyond -20). There is a gain
+increase which makes the image looks very artificial despite all the
+countermeasures. The control is a good idea."*
+
+**Correction 1 — we asked for the wrong thing on channels.** Point 3 above asked
+for *the same schedule on both channels*. That was aimed at the wrong hazard. Our
+dead/live call is not a red-to-blue intensity ratio; it is *presence or absence of
+EthD-1 above a detection threshold* at a nucleus found in Hoechst. What that needs
+is for each channel's detection sensitivity to be depth-stable — which is exactly
+what normalising each channel to its own surface brightness delivers, and a shared
+schedule would not. Torsten's answer is better than the request.
+
+The real hazard is elsewhere, and it is the one to watch: **gain amplifies each
+channel's background along with its signal.** If EthD-1 background at depth is
+lifted towards the detection threshold, live nuclei acquire a faint apparent
+EthD-1 signal and are miscalled dead — reproducing the §4 artifact through a new
+route, and in the same direction. This is what his offset advice guards against,
+and it is why the background level per channel per slice must be recorded, not
+just the gain.
+
+**Correction 2 — the surface must not be at the ceiling.** Every deeper slice is
+aimed at the surface slice, so the surface sets the target for the whole stack. On
+our existing images, simulating a x4 gain on a shallow slice drove p99 to 255 and
+*reduced* the contrast-to-noise of detected nuclei from 10.4 to 8.0, because the
+brightest nuclei clip and merge into the ceiling. If the surface is set near
+saturation, matching it at depth clips there too. **Set the surface exposure with
+visible headroom** — that instruction is ours, not his, and it should go to Louise.
+
+### Does the ramp buy countability? We cannot answer this from our images
+
+This was question 1, and the honest answer is that it is not answerable in advance.
+Torsten confirms the distinction is real — there is a gain level at which the image
+"looks very artificial despite all the countermeasures" — but judges it by eye,
+which is exactly the investigator degree of freedom we are trying to remove.
+
+We attempted to settle it by simulating a ramp on the existing stacks. **That
+cannot work, for a structural reason.** Detection thresholds at `median + 3.5 sigma`
+of each slice's own background. Multiplying an image by a gain g scales the peak,
+the median and sigma identically, so the inequality is unchanged and *the detected
+set is invariant by construction*. Measured: at z17, object count was exactly 270
+at every gain from x1 to x8. That is not evidence the ramp fails — it is evidence
+that the test is vacuous. Real gain is applied at the PMT, **before** the
+analogue-to-digital converter; our stacks are already digitised, and multiplying
+8-bit integers cannot recover what quantisation and read noise have already
+removed.
+
+**Consequence: the paired control stack is not good practice, it is the only
+available evidence.** Nothing we can compute from the current images predicts
+whether the ramp restores countability or only brightness. A corrected and an
+uncorrected stack of the same field, same nuclei, is the only comparison that can
+answer it. Torsten independently agrees the control is worth doing. It must not be
+dropped.
+
+### The brightness test in `depth_profile.py` had to change
+
+`tools/depth_profile.py` judged countability by `p99 < 40`, an absolute brightness.
+**A gain ramp is designed to hold brightness constant with depth, so on ramped
+stacks every slice passes that test by construction** and the tool silently stops
+working — the failure mode it exists to catch becomes invisible to it.
+
+Added two gain-robust columns:
+
+- `contrast` — height of a typical detected peak over local background, in grey
+  levels;
+- `cnr` — the same in units of background noise, with the denominator floored at
+  one grey level.
+
+The floor matters. Without it a nearly black slice scores *well*: the background
+MAD falls to 0.41 grey levels at z17, below the quantisation step, and the ratio
+then rewards an image with nothing in it. Before flooring, `006/1/Image 5` scored a
+*higher* contrast ratio at 53 µm (13.1) than at 16 µm (10.4). That metric was
+discarded.
+
+`--ramped` switches the verdict from p99 to cnr. **`DIM_CNR = 9.0` is transferred
+from the eyeballed p99 = 40 line, not independently derived, and it does not
+separate the two groups cleanly** — the worst slice above the p99 line scores 8.4
+and the best slice below it scores 9.8. Two slices sit in that overlap
+(`003/1/Image 8` z05, p99 = 37 but contrast 16.2; `003/2/Image 21` z09, p99 = 25
+but cnr 9.8) and may well be cases where the *brightness* rule is wrong rather than
+the contrast rule. They are worth looking at by eye before either threshold is
+trusted. Both thresholds should be re-derived on the new stacks.
+
+### On "use 3D Analyse in ImageJ"
+
+His second suggestion: threshold and use 3D object analysis, where *"it is clear
+which nuclei overlap and which are separate regardless from the Z step"*. Three
+things follow, and they are not all the same.
+
+**For the automated pipeline he is right**, and it is close to what §4b already
+does. We detect per slice and link across slices rather than thresholding a 3D
+volume, for the reason in §4b: signal decays steeply with depth, so one threshold
+is simultaneously too high at the top of the stack and too low at the bottom.
+**But that objection is exactly what the gain ramp removes.** If brightness is
+equalised across depth, a single 3D threshold becomes defensible for the first
+time. His two pieces of advice fit together better than either does alone.
+
+**For the human reliability study it does not help.** Counters work on 2D tiles on
+a tablet; the concern in §4b is not that the software double-counts, it is that a
+*person* shown two depths may meet the same physical nucleus twice, which makes
+those two observations non-independent. No amount of 3D analysis on our side
+changes what the person saw.
+
+**But it converts an assumption into a measurement, which is the real gain.** §4b
+infers overlap between two z-levels from the *median* axial extent of a nucleus
+(~16 µm, hence the ~47 µm separation rule). With 3D linking we can instead measure,
+for any candidate pair of depths, *what fraction of nuclei actually appear in
+both* — for that specimen, rather than for a median. The depth ladder can then be
+chosen on measured overlap instead of on a rule of thumb. **This is the part of his
+answer to act on**, and it applies whether or not the ramp succeeds.
+
+
 ---
 
 ## 5. What Maryam and Louise's data actually shows
