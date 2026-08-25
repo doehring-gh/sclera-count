@@ -227,6 +227,31 @@ imaging by two-photon microscopy: the significance of far-red emitting dyes.**
 
 ---
 
+## Personal communications
+
+Not literature, but method advice acted on in the design, so it is recorded and
+attributable. Verbatim text in
+[`correspondence/RECEIVED_TORSTEN.md`](correspondence/RECEIVED_TORSTEN.md).
+
+**Bossing T (2026). Confocal acquisition for depth-resolved nuclear counting in
+unsectioned scleral tissue.** Personal communication, 24–25 August 2026.
+Head of Plymouth Light Microscopy Services, Peninsula Medical School, University
+of Plymouth.
+
+Supports, in FINDINGS §4c: use of **Auto Z Brightness Correction** ramping **gain**
+(not laser power) with the surface slice as the brightness target; **per-channel**
+schedules, each channel aimed at its own surface; **Average up / Offset closed, not
+beyond −20** against pixelation; the existence of a gain level at which the image
+becomes artificial despite countermeasures; endorsement of a **paired uncorrected
+control stack**; and **3D object analysis** for resolving which nuclei overlap
+between slices. Also prompted the two interface changes in §6 (greyscale default,
+shape-coded markers).
+
+If the depth or acquisition method is written up, this needs acknowledgement at
+minimum, and the co-authorship question should be asked rather than assumed.
+
+---
+
 ## What is *not* covered by any of these
 
 No paper found here measures **how manual countability changes with confocal

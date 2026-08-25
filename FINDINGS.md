@@ -335,15 +335,32 @@ Torsten confirms the distinction is real — there is a gain level at which the 
 which is exactly the investigator degree of freedom we are trying to remove.
 
 We attempted to settle it by simulating a ramp on the existing stacks. **That
-cannot work, for a structural reason.** Detection thresholds at `median + 3.5 sigma`
-of each slice's own background. Multiplying an image by a gain g scales the peak,
-the median and sigma identically, so the inequality is unchanged and *the detected
-set is invariant by construction*. Measured: at z17, object count was exactly 270
-at every gain from x1 to x8. That is not evidence the ramp fails — it is evidence
-that the test is vacuous. Real gain is applied at the PMT, **before** the
-analogue-to-digital converter; our stacks are already digitised, and multiplying
-8-bit integers cannot recover what quantisation and read noise have already
-removed.
+cannot work, and it fails in two different ways depending on the detector — one
+of which looks like a result.** Reproduce with
+`tools/ramp_check.py --simulate`.
+
+**With a purely noise-referenced threshold** (`median + 3.5 sigma` of the slice's
+own background) the detected set is *invariant by construction*: multiplying by a
+gain g scales peak, median and sigma identically, so the inequality is unchanged.
+Measured at z17: object count exactly 270 at every gain from x1 to x8.
+
+**With the production detector** (`tools/z_trace.py`, which adds an absolute floor
+at `lo + min_frac*(hi-lo)`) the count instead *climbs steeply* — 1411 to 3361 over
+x1 to x8 on `006/1/Image 5`. This is not recovery. These stacks already contain
+saturated pixels, so `hi` is pinned at 255 and **the floor stops scaling with the
+image**; multiplying then lifts pixels over a fixed bar. The count rises 11% at a
+gain of x1.1, with 0.085% of pixels saturated — far too small to be recovering
+anything.
+
+**The second failure is the dangerous one, because it produces a plausible
+number.** Anyone simulating a ramp with the production detector would report that
+gain recovers roughly twice the nuclei, and be entirely wrong. Recorded here so
+that result is not rediscovered and believed.
+
+Neither addresses the real question, because real gain is applied at the PMT,
+**before** the analogue-to-digital converter; our stacks are already digitised, and
+multiplying 8-bit integers cannot recover what quantisation and read noise have
+already removed.
 
 **Consequence: the paired control stack is not good practice, it is the only
 available evidence.** Nothing we can compute from the current images predicts
@@ -351,6 +368,43 @@ whether the ramp restores countability or only brightness. A corrected and an
 uncorrected stack of the same field, same nuclei, is the only comparison that can
 answer it. Torsten independently agrees the control is worth doing. It must not be
 dropped.
+
+### How the paired stacks will be judged: axial persistence
+
+Brightness cannot tell a recovered nucleus from amplified noise, so the paired
+comparison needs a different signature. `tools/ramp_check.py --pair` uses one:
+
+> a real nucleus is ~16 µm tall and appears on ~3 consecutive slices;
+> an amplified noise maximum does not reappear at the same (x, y) on the next slice.
+
+So the test is not "are there more detections" but "**do the extra detections
+persist axially**", using the same linking as `z_trace.py`:
+
+| | reading |
+|---|---|
+| detections up, persistence holds | **real** — the ramp recovered nuclei |
+| detections up, persistence collapses | **cosmetic** — gain made noise plausible |
+| detections flat | the ramp changed nothing countable |
+
+**The discriminator was validated in both directions**, which matters — one that
+only ever says "real" would be worthless:
+
+- *positive case*: on a modelled pair (attenuated + read noise vs true signal)
+  detections rose 784 → 880 and persistence held at 87.1%. Read noise is the
+  right model because that is what a PMT ramp actually fights; attenuation alone
+  proves nothing, since the detector is scale-invariant.
+- *negative case*: amplifying `003/1/Image 5` z13–z19, where signal is genuinely
+  gone, doubled detections (238 → 469 at x16) while **persistence fell, 16.0% →
+  11.5%**. Against 86% for slices with real nuclei, that is a fivefold separation.
+
+Both run from `tools/ramp_check.py --self-test`.
+
+**A caveat that cost a false result on the way.** An earlier negative control
+amplified a stack that still contained real dim structure and called it
+"cosmetic". The discriminator correctly reported "real" — the *test* was wrong,
+not the tool. Amplifying anything with recoverable structure in it genuinely does
+recover structure. A valid cosmetic control must use slices where the signal is
+actually gone.
 
 ### The brightness test in `depth_profile.py` had to change
 
@@ -460,6 +514,8 @@ nucleus gets an explicit label, and an empty square is its own recorded answer.
 | **Gate derived, never chosen** | Each expert is scored against the consensus they helped build — the most favourable test, therefore the ceiling. On simulated experts this gave location 0.90 but count **0.85**. |
 | `--prefill-from` refused with `--reference-passes > 1` | Identical drafts make independent passes agree trivially, inflating the number that justifies the gate. |
 | Training squares held out of every counting set | Otherwise a counter later counts a square whose answer they were shown. |
+| **Greyscale nuclei is the default counting view** | Counting happens on one channel against its own background; the merged view is for orientation only. It was previously reachable but not default, and an expert reviewer did not find it — so nor would twenty non-experts. Torsten Bossing, 2026-08-24. |
+| **Markers differ by shape, not only colour** | Circle live, square dead, triangle unsure. Around one man in twelve cannot rely on a red/green pair, and hue-only coding is weak on a busy greyscale field for anyone. Colour now reinforces the shape rather than carrying the meaning. |
 | Detector proposals are a draft, never the reference | The study compares manual counts against the automated pipeline. Training people to match a detector then measuring their agreement with a detector answers nothing. |
 
 ---
@@ -607,7 +663,21 @@ observers differ by 30 points of viability on identical images.
 2. **Section or not** — sectioning buys depth but creates a cut-face dead layer to
    exclude. *With the expert panel.*
 3. **Sensitivity floor** — how to bound per-slice viability so §4's artifact
-   cannot be reported as biology. *Unsolved.*
+   cannot be reported as biology. *Unsolved.* The gain ramp (§4c) may reduce it at
+   source, but reducing is not bounding, and a ramp that only adds brightness
+   would leave it untouched.
+3b. **Does the gain ramp recover countability or only brightness?** *Unanswerable
+   from existing images* — see §4c. Needs Louise's paired corrected/uncorrected
+   stacks, then `tools/ramp_check.py --pair`.
+3c. **Both countability thresholds are eyeballed or transferred.** `DIM_P99 = 40`
+   was set by looking at tiles; `DIM_CNR = 9.0` is transferred from it and does not
+   separate the groups cleanly. Two slices sit in the overlap (`003/1/Image 8` z05,
+   `003/2/Image 21` z09) and may be cases where the *brightness* rule is wrong.
+   Look at those tiles, then re-derive both on the new stacks.
+3d. **Measure depth overlap instead of assuming it.** §4b infers it from the
+   *median* axial extent (~16 µm → ~47 µm separation). With 3D linking we can
+   measure, per specimen, what fraction of nuclei actually appear at both of two
+   candidate depths. Torsten's suggestion; applies whether or not the ramp works.
 4. **4-hour post-mortem interval** — Svare 2021 found porcine *retina* at 240 min
    significantly more damaged than at 90 min. Sclera is far less metabolically
    demanding, so this should not be read across directly, but the window matches.
@@ -784,6 +854,11 @@ cd ~/Library/CloudStorage/OneDrive-UniversityofPlymouth/JupyterLab/Sclera/SCLERA
 
 /usr/bin/python3 tools/fetch_sources.py --fetch --watch        # get the images
 /usr/bin/python3 tools/depth_profile.py --z-levels 3,5,7,9,11,13
+/usr/bin/python3 tools/depth_profile.py --z-levels 3,5,7,9,11,13 --ramped   # new stacks
+/usr/bin/python3 tools/z_trace.py --stacks "006/Image 5" --z-range 3,11
+/usr/bin/python3 tools/ramp_check.py --simulate      # why a ramp cannot be simulated
+/usr/bin/python3 tools/ramp_check.py --self-test     # validates the discriminator
+/usr/bin/python3 tools/ramp_check.py --pair "CORRECTED" "UNCORRECTED"      # when paired stacks exist
 /usr/bin/python3 analysis/legacy_agreement.py                  # Maryam vs Louise
 /usr/bin/python3 tools/propose_reference.py --manifest docs/manifest.json
 /usr/bin/python3 analysis/make_reference.py e1.json e2.json e3.json --manifest docs/manifest.json

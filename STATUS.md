@@ -58,13 +58,22 @@ Three things came out of working through that reply, all in FINDINGS §4c:
   judged countability by absolute brightness and a ramp holds brightness constant
   by design. Fixed: it now also reports contrast and a noise-referenced ratio, with
   `--ramped` to switch the verdict. Both thresholds need re-deriving on new stacks.
+- **New tool `tools/ramp_check.py`** decides the corrected-vs-uncorrected question
+  when the pair arrives, on **axial persistence** rather than brightness: real
+  nuclei reappear on the next slice, amplified noise does not. Validated both ways
+  — 87% persistence on a modelled real recovery, falling 16.0% → 11.5% when a
+  signal-gone stack is amplified. `--simulate` documents why simulation is
+  worthless, including a trap that yields a plausible but entirely spurious
+  "gain recovers 2x the nuclei".
 - **His 3D suggestion converts an assumption into a measurement.** It does not help
   the human study (counters see 2D tiles), but instead of inferring depth overlap
   from the *median* axial extent of a nucleus, we can measure what fraction of
   nuclei actually appear at both of two candidate depths. Worth doing either way.
 
-Replies drafted: `correspondence/REPLY_TO_TORSTEN_3.md`. Acquisition protocol for
-Louise: `correspondence/ACQUISITION_REQUEST_LOUISE.md`.
+His three replies are archived verbatim in
+`correspondence/RECEIVED_TORSTEN.md` — that file is the source where our reading
+and his words differ. **`correspondence/README.md` is the index of what has
+actually been sent and what is only drafted**; three items are drafted and unsent.
 
 ---
 
@@ -92,6 +101,7 @@ All tested, nothing outstanding:
   Bland–Altman with proportional bias, object-level detection F1, Cohen's kappa,
   intra-rater ceiling, by-depth breakdown
 - **Ethics documents** — all four filled and in `ethics/`
+- **Ramp verification** — `tools/ramp_check.py --pair`, ready for Louise's stacks
 
 ---
 
